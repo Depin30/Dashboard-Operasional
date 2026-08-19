@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +41,10 @@ app.get('/admin', (req, res) => {
 
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'register.html'));
 });
 
 // ==================== API DASHBOARD (index.html) ====================
@@ -224,7 +229,69 @@ app.post('/api/entry', async (req, res) => {
         res.status(500).json({ success: false, error: 'Gagal menyimpan data ke database' });
     }
 });
+// ==================== API REGISTER (Dengan Bcrypt) ====================
+app.post('/api/register', async (req, res) => {
+    const { username, password } = req.body;
 
+    if (!username || !password) {
+        return res.status(400).json({ success: false, message: 'Username dan Kata Sandi harus diisi!' });
+    }
+
+    try {
+        // Cek apakah username sudah ada
+        const [existingUser] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+        if (existingUser.length > 0) {
+            return res.status(400).json({ success: false, message: 'Username sudah digunakan!' });
+        }
+
+        // Acak password menggunakan bcrypt sebelum dimasukkan ke database
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Masukkan data ke database dengan password yang sudah diacak
+        await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword]);
+        
+        res.json({ success: true, message: 'Akun berhasil dibuat! Silakan login.' });
+    } catch (err) {
+        console.error("Error Register:", err);
+        res.status(500).json({ success: false, message: 'Gagal menyimpan data ke database.' });
+    }
+});
+
+// ==================== API LOGIN (Dengan Bcrypt) ====================
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Cari user berdasarkan username saja terlebih dahulu
+        const [users] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+
+        if (users.length > 0) {
+            const user = users[0];
+            
+            // Cocokkan password yang diketik dengan password acak di database
+            const match = await bcrypt.compare(password, user.password);
+
+            if (match) {
+                // Jika password cocok
+                res.json({ 
+                    success: true, 
+                    message: 'Login berhasil! Mengalihkan...', 
+                    user: { username: user.username } 
+                });
+            } else {
+                // Jika password salah
+                res.status(401).json({ success: false, message: 'Kata Sandi salah!' });
+            }
+        } else {
+            // Jika username tidak ditemukan
+            res.status(401).json({ success: false, message: 'Username tidak ditemukan!' });
+        }
+    } catch (err) {
+        console.error("Error Login:", err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
+    }
+});
 // Menjalankan Server
 app.listen(PORT, () => {
     console.log(`Server SIMRS berjalan di http://localhost:${PORT}`);
