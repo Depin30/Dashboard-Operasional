@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Operasional - RS Cinta Kasih Tzu Chi</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        plasma: { bg: '#050814', card: '#0b132b', border: '#1e293b', accent: '#3b82f6' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    
+    <style>
+        html, body { height: 100vh; width: 100vw; overflow: hidden; margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #050814; color: #f1f5f9; }
+        .card-plasma { background: #0b132b; border: 1px solid #1e293b; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4); overflow: hidden; position: relative; display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .card-plasma:hover { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.15); }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #050814; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    </style>
+</head>
+<body class="flex h-screen w-screen overflow-hidden antialiased selection:bg-blue-600 selection:text-white">
+
+    <aside id="sidebar" class="w-64 bg-[#080e21] text-white flex flex-col justify-between shrink-0 border-r border-slate-800/80 z-20 h-full transition-all duration-300 overflow-hidden">
+        <div class="p-4 w-64 shrink-0">
+            <div class="mb-6 flex items-center gap-3">
+                <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-hospital text-sm text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-[11px] font-black tracking-wider text-white">RS CINTA KASIH</h1>
+                    <p class="text-[9px] text-blue-400 font-semibold tracking-widest mt-0.5">TZU CHI</p>
+                </div>
+            </div>
+            
+            <div class="space-y-1">
+                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 mb-1.5">Command Center</p>
+                <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-600/20 text-blue-400 font-semibold text-xs border border-blue-500/30 shadow-sm transition">
+                    <i class="fa-solid fa-chart-pie w-4 text-center"></i> Display Dashboard
+                </a>
+                <a href="/admin" target="_blank" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
+                    <i class="fa-solid fa-pen-to-square w-4 text-center"></i> Entry & Kelola Data
+                </a>
+            </div>
+        </div>
+
+        <div class="p-4 w-64 shrink-0 space-y-3">
+            <div class="bg-[#050814] p-3 rounded-xl border border-slate-800 text-xs">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-slate-400 font-medium text-[10px]">Database MySQL</span>
+                    <span class="flex h-2 w-2 relative">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                </div>
+                <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-800/80">
+                    <span class="text-slate-500">Sinkronisasi:</span>
+                    <span id="lastUpdateText" class="font-mono text-emerald-400 font-medium">--:--:--</span>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Keluar (Logout)
+            </button>
+            <div class="text-[9px] text-slate-600 text-center font-medium">&copy; 2026 SIMRS IT Department</div>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-full overflow-hidden flex flex-col min-h-0 bg-plasma-bg">
+        <header class="bg-[#0b132b]/90 backdrop-blur-md px-6 py-2.5 border-b border-slate-800 flex justify-between items-center shrink-0 z-30">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm" title="Sembunyikan/Tampilkan Menu">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+                <div>
+                    <h2 class="text-sm font-extrabold text-white tracking-tight flex items-center gap-2">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        DASHBOARD OPERASIONAL HARIAN
+                    </h2>
+                    <p class="text-[10px] text-slate-400 font-medium">Live monitoring operasional dan finansial rumah sakit</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="manualRefresh()" title="Ambil data terbaru sekarang" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-rotate" id="refreshIcon"></i> Refresh
+                </button>
+                <button id="toggleSyncBtn" onclick="toggleSync()" title="Jeda atau Lanjutkan Sinkronisasi Otomatis" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-pause" id="syncIcon"></i> <span id="syncText">Live: Aktif</span>
+                </button>
+                <div class="flex items-center gap-2 bg-[#050814] px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 border border-slate-800">
+                    <i class="fa-regular fa-calendar-days text-blue-400"></i>
+                    <span id="currentDateIndicator">Memuat tanggal...</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-2.5 flex-1 grid grid-rows-[auto_minmax(0,1fr)_105px] gap-2 overflow-hidden max-w-[1700px] w-full mx-auto min-h-0">
+            <div class="grid grid-cols-1 lg:grid-cols-6 gap-2.5">
+                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Target Pendapatan</span>
+                        <h3 id="targetFinansialText" class="text-base font-black text-white tracking-tight mt-0.5">Rp 0</h3>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex justify-center items-center text-xs border border-blue-500/20"><i class="fa-solid fa-bullseye"></i></div>
+                </div>
+
+                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                    <div class="w-full">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Realisasi Pendapatan</span>
+                        <div class="flex items-baseline gap-2 mt-0.5">
+                            <h3 id="realisasiText" class="text-base font-black text-white tracking-tight">Rp 0</h3>
+                            <span id="persenRealisasiText" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">0%</span>
+                        </div>
+                    </div>
+                    <div class="w-7 h-7 shrink-0 rounded-lg bg-emerald-500/10 text-emerald-400 flex justify-center items-center text-xs border border-emerald-500/20"><i class="fa-solid fa-wallet"></i></div>
+                </div>
+
+                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Gap / Selisih Target</span>
+                        <h3 id="gapText" class="text-base font-black text-white tracking-tight mt-0.5">Rp 0</h3>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex justify-center items-center text-xs border border-purple-500/20"><i class="fa-solid fa-chart-line"></i></div>
+                </div>
+
+                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Rawat Jalan (R / T)</span>
+                        <div class="flex items-baseline gap-1 mt-0.5">
+                            <h3 id="rajalTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
+                        </div>
+                    </div>
+                    <span id="rajalPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">0%</span>
+                </div>
+
+                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">IGD Pasien (R / T)</span>
+                        <div class="flex items-baseline gap-1 mt-0.5">
+                            <h3 id="igdTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
+                        </div>
+                    </div>
+                    <span id="igdPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">0%</span>
+                </div>
+
+                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Rawat Inap (R / T)</span>
+                        <div class="flex items-baseline gap-1 mt-0.5">
+                            <h3 id="ranapTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
+                        </div>
+                    </div>
+                    <span id="ranapPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">0%</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-2.5 min-h-0">
+                
+                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                    <div class="flex justify-between items-center mb-1 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-[9px] border border-blue-500/20"><i class="fa-solid fa-hospital-user"></i></div>
+                            <h3 class="font-bold text-white text-xs">Top Poliklinik</h3>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="poliTotalText" class="text-[9px] font-semibold text-slate-400">0 / 0</span>
+                            <span id="poliPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-400">0%</span>
+                        </div>
+                    </div>
+                    <div class="relative w-full flex-1 min-h-0"><canvas id="topPoliChart"></canvas></div>
+                </div>
+                
+                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                    <div class="flex justify-between items-center mb-1 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded bg-pink-500/10 text-pink-400 flex items-center justify-center text-[9px] border border-pink-500/20"><i class="fa-solid fa-baby"></i></div>
+                            <h3 class="font-bold text-white text-xs">Top Kebidanan</h3>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="kebidananTotalText" class="text-[9px] font-semibold text-slate-400">0 / 0</span>
+                            <span id="kebidananPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-pink-500/20 text-pink-400">0%</span>
+                        </div>
+                    </div>
+                    <div class="relative w-full flex-1 min-h-0"><canvas id="kebidananChart"></canvas></div>
+                </div>
+
+                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                    <div class="flex justify-between items-center mb-1 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded bg-violet-500/10 text-violet-400 flex items-center justify-center text-[9px] border border-violet-500/20"><i class="fa-solid fa-bed-pulse"></i></div>
+                            <h3 class="font-bold text-white text-xs">Kamar Operasi (OK)</h3>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="operasiTotalText" class="text-[9px] font-semibold text-slate-400">0 / 0</span>
+                            <span id="operasiPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-violet-500/20 text-violet-400">0%</span>
+                        </div>
+                    </div>
+                    <div class="relative w-full flex-1 min-h-0"><canvas id="kamarOperasiChart"></canvas></div>
+                </div>
+
+                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0 relative overflow-hidden border-blue-500/30">
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-48 h-24 bg-blue-500/10 blur-3xl pointer-events-none z-0"></div>
+                    
+                    <div class="flex justify-between items-center mb-1 shrink-0 relative z-10">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-[9px] border border-blue-500/20"><i class="fa-solid fa-gauge-high"></i></div>
+                            <h3 class="font-bold text-white text-xs">Capaian IGD</h3>
+                        </div>
+                        <span id="igdHeaderPersen" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">0%</span>
+                    </div>
+                    
+                    <div class="relative flex justify-center items-center flex-1 min-h-0 z-10 mt-2">
+                        <canvas id="igdChart"></canvas>
+                        <div class="absolute inset-x-0 bottom-1 flex flex-col items-center justify-center pointer-events-none">
+                            <span id="igdCenterValue" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 tracking-tight leading-none drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">0</span>
+                            <span id="igdCenterSub" class="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-wider">Pasien Masuk</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                    <div class="flex justify-between items-center mb-1 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded bg-slate-800 text-slate-300 flex items-center justify-center text-[9px] border border-slate-700"><i class="fa-solid fa-bed"></i></div>
+                            <h3 class="font-bold text-white text-xs">BOR Rawat Inap</h3>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="borInfoText" class="text-[9px] font-semibold text-slate-400">Isi: 0 / Kap: 0</span>
+                            <span id="borTotalText" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-800 text-slate-300">0%</span>
+                        </div>
+                    </div>
+                    <div class="relative w-full flex-1 min-h-0"><canvas id="borChart"></canvas></div>
+                </div>
+
+                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                    <div class="flex justify-between items-center mb-1 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-[9px] border border-cyan-500/20"><i class="fa-solid fa-eye"></i></div>
+                            <h3 class="font-bold text-white text-xs">Top OK Mata</h3>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="mataTotalText" class="text-[9px] font-semibold text-slate-400">0 / 0</span>
+                            <span id="mataPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-400">0%</span>
+                        </div>
+                    </div>
+                    <div class="relative w-full flex-1 min-h-0"><canvas id="dokterMataChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                <div class="flex justify-between items-center mb-1 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-[9px] border border-emerald-500/20"><i class="fa-solid fa-chart-area"></i></div>
+                        <h3 class="font-bold text-white text-xs">Tren Pendapatan Harian vs Target</h3>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="trenTotalText" class="text-[9px] font-semibold text-slate-400">Realisasi: Rp 0 / Target: Rp 0</span>
+                        <span id="trenPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400">0%</span>
+                    </div>
+                </div>
+                <div class="relative w-full flex-1 min-h-0"><canvas id="pendapatanChart"></canvas></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // AUTH GUARD
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = '/login';
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            window.location.href = '/login';
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('w-64');
+            sidebar.classList.toggle('w-0');
+        }
+
+        // DEFAULTS CHART.JS
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.scale.grid.color = 'rgba(30, 41, 59, 0.6)';
+        Chart.defaults.scale.grid.lineWidth = 1;
+        Chart.defaults.scale.ticks.font = { size: 10, weight: '500', family: "'Inter', sans-serif" }; 
+        
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.95)';
+        Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+        Chart.defaults.plugins.tooltip.bodyColor = '#e2e8f0';
+        Chart.defaults.plugins.tooltip.borderColor = '#334155';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.titleFont = { family: "'Inter', sans-serif", size: 12, weight: '700' };
+        Chart.defaults.plugins.tooltip.bodyFont = { family: "'Inter', sans-serif", size: 11 };
+        Chart.defaults.plugins.tooltip.padding = 6;
+        Chart.defaults.plugins.tooltip.cornerRadius = 6;
+        Chart.defaults.plugins.tooltip.usePointStyle = true;
+
+        Chart.register(ChartDataLabels);
+
+        const formatMiliar = (val) => {
+            const inMiliar = val / 1000000000;
+            return `Rp ${inMiliar.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })}m`;
+        };
+
+        const datalabelsConfig = {
+            color: '#ffffff', 
+            font: { weight: 'bold', size: 11, family: "'Inter', sans-serif" },
+            formatter: (value) => value > 0 ? value.toLocaleString('id-ID') : ''
+        };
+
+        // --- PLUGIN JARUM MODERN ---
+        const modernGaugeNeedle = {
+            id: 'modernGaugeNeedle',
+            afterDatasetsDraw(chart) {
+                const { ctx, data } = chart;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta || !meta.data || !meta.data[0]) return;
+
+                const xCenter = meta.data[0].x;
+                const yCenter = meta.data[0].y;
+                const outerRadius = meta.data[0].outerRadius;
+                const innerRadius = meta.data[0].innerRadius;
+                // Posisi ujung jarum berada tepat di tengah-tengah antara lingkaran luar dan dalam
+                const needleLength = innerRadius + (outerRadius - innerRadius) / 2; 
+
+                const needleValue = data.datasets[0].needleValue || 0;
+                const minValue = data.datasets[0].minValue || 0;
+                const maxValue = data.datasets[0].maxValue || 1000;
+
+                let percentage = (needleValue - minValue) / (maxValue - minValue);
+                if (percentage < 0) percentage = 0;
+                if (percentage > 1) percentage = 1;
+                
+                // Konversi ke radian (setengah lingkaran: PI sampai 2*PI)
+                const angle = Math.PI + (percentage * Math.PI);
+
+                ctx.save();
+                ctx.translate(xCenter, yCenter);
+                ctx.rotate(angle);
+
+                // Efek Glow pada Jarum
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#f8fafc';
+
+                // Gambar Jarum Meruncing yang Modern
+                ctx.beginPath();
+                ctx.moveTo(0, -2);
+                ctx.lineTo(needleLength - 5, -1);
+                ctx.lineTo(needleLength, 0); // Ujung lancip
+                ctx.lineTo(needleLength - 5, 1);
+                ctx.lineTo(0, 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                // Matikan shadow agar poros tidak blur berlebihan
+                ctx.shadowBlur = 0;
+
+                // Poros Jarum (Lingkaran Bolong ala Sci-Fi)
+                ctx.beginPath();
+                ctx.arc(0, 0, 7, 0, Math.PI * 2);
+                ctx.fillStyle = '#0b132b'; // Sama dengan warna background card
+                ctx.fill();
+                
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = '#3b82f6'; // Ring biru di poros
+                ctx.stroke();
+
+                // Titik putih kecil di poros terdalam
+                ctx.beginPath();
+                ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                ctx.restore();
+            }
+        };
+
+        const commonBarOptions = { 
+            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+            animation: { duration: 600 },
+            plugins: { 
+                legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, font: { weight: 600, size: 10 }, color: '#f8fafc' } },
+                datalabels: { ...datalabelsConfig, anchor: 'end', align: 'top', offset: 2 }
+            },
+            scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } }
+        };
+
+        const commonHorizontalOptions = { 
+            indexAxis: 'y', responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+            animation: { duration: 600 },
+            plugins: { 
+                legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, font: { weight: 600, size: 10 }, color: '#f8fafc' } },
+                datalabels: { ...datalabelsConfig, anchor: 'end', align: 'right', offset: 2 } 
+            },
+            scales: { y: { grid: { display: false } }, x: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } }
+        };
+
+        // INISIALISASI CHART.JS (Poli, Kebidanan, OK, BOR, Mata)
+        const topPoliChart = new Chart(document.getElementById('topPoliChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: [], datasets: [
+                { label: 'Realisasi', data: [], backgroundColor: '#3b82f6', borderRadius: 3, borderSkipped: false },
+                { label: 'Target', data: [], backgroundColor: '#1e3a8a', borderRadius: 3, borderSkipped: false }
+            ]}, options: commonBarOptions
+        });
+
+        const kebidananChart = new Chart(document.getElementById('kebidananChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: [], datasets: [
+                { label: 'Realisasi', data: [], backgroundColor: '#ec4899', borderRadius: 3, borderSkipped: false },
+                { label: 'Target', data: [], backgroundColor: '#831843', borderRadius: 3, borderSkipped: false }
+            ]}, options: commonHorizontalOptions
+        });
+
+        const kamarOperasiChart = new Chart(document.getElementById('kamarOperasiChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: [], datasets: [
+                { label: 'Realisasi', data: [], backgroundColor: '#8b5cf6', borderRadius: 3, borderSkipped: false },
+                { label: 'Target', data: [], backgroundColor: '#4c1d95', borderRadius: 3, borderSkipped: false }
+            ]}, options: commonBarOptions
+        });
+
+        // INIT CHART IGD MODERN (Doughnut)
+        const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Aman', 'Waspada', 'Tinggi'],
+                datasets: [{ 
+                    // Pembagian ukuran cincin (sepertiga rata)
+                    data: [33.3, 33.3, 33.4], 
+                    backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(245, 158, 11, 0.85)', 'rgba(225, 29, 72, 0.85)'],
+                    borderWidth: 3,
+                    borderColor: '#0b132b', // Warna border disamakan dgn background agar terlihat seperti celah/gap
+                    borderRadius: 6, // Ujung tumpul (Modern UI)
+                    needleValue: 0, 
+                    minValue: 0, 
+                    maxValue: 1000 
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                circumference: 180, 
+                rotation: 270, 
+                cutout: '80%', // Cincin yang tipis elegan
+                animation: { duration: 1000, easing: 'easeOutQuart' }, 
+                plugins: { 
+                    legend: { display: false }, 
+                    tooltip: { enabled: false }, 
+                    datalabels: { display: false } 
+                },
+                layout: { padding: { bottom: 10 } }
+            },
+            plugins: [modernGaugeNeedle] // Pasang plugin jarum baru
+        });
+
+        const borChart = new Chart(document.getElementById('borChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: [], datasets: [
+                { label: 'Bed Terisi', data: [], backgroundColor: '#0ea5e9', borderRadius: 3, borderSkipped: false },
+                { label: 'Kapasitas', data: [], backgroundColor: '#1e293b', borderRadius: 3, borderSkipped: false }
+            ]}, options: commonBarOptions
+        });
+
+        const dokterMataChart = new Chart(document.getElementById('dokterMataChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: [], datasets: [
+                { label: 'Realisasi', data: [], backgroundColor: '#06b6d4', borderRadius: 3, borderSkipped: false },
+                { label: 'Target', data: [], backgroundColor: '#164e63', borderRadius: 3, borderSkipped: false }
+            ]}, options: commonHorizontalOptions
+        });
+
+        const ctxPendapatan = document.getElementById('pendapatanChart').getContext('2d');
+        const pendapatanGradient = ctxPendapatan.createLinearGradient(0, 0, 0, 80);
+        pendapatanGradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+        pendapatanGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+        const pendapatanChart = new Chart(ctxPendapatan, {
+            type: 'line',
+            data: { labels: [], datasets: [
+                { label: 'Realisasi (Rp)', data: [], borderColor: '#10b981', backgroundColor: pendapatanGradient, fill: true, tension: 0.4, borderWidth: 2, pointBackgroundColor: '#0b132b', pointBorderColor: '#10b981', pointBorderWidth: 1.5, pointRadius: 2.5, pointHoverRadius: 4 },
+                { label: 'Target (Rp)', data: [], borderColor: '#64748b', borderDash: [3, 3], fill: false, tension: 0.4, borderWidth: 1, pointRadius: 0 }
+            ]}, 
+            options: { 
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, animation: { duration: 600 }, 
+                plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, font: { weight: 600, size: 10 }, color: '#f8fafc' } }, datalabels: { display: false } }, 
+                scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } } 
+            }
+        });
+
+        async function updateDashboardFromMySQL() {
+            try {
+                const response = await fetch('/api/dashboard');
+                const data = await response.json();
+                if (!data) return;
+
+                // 1. Finansial / Pendapatan Harian
+                const fin = data.finansial || {};
+                const targetFin = Number(fin.target_pendapatan || fin.target || 0);
+                const realisasiFin = Number(fin.realisasi_pendapatan || fin.realisasi || 0);
+                const gapFin = realisasiFin - targetFin;
+                const persenFin = targetFin > 0 ? ((realisasiFin / targetFin) * 100).toFixed(1) : 0;
+
+                document.getElementById('targetFinansialText').innerText = formatMiliar(targetFin);
+                document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
+                
+                const realisasiBadge = document.getElementById('persenRealisasiText');
+                if (gapFin >= 0) {
+                    realisasiBadge.innerHTML = `▲ ${persenFin}%`;
+                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                } else {
+                    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
+                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                }
+                document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
+
+                // 2. Ringkasan Kunjungan Pasien (Rajal, IGD, Ranap)
+                let rajalR = 0, rajalT = 0, igdR = 0, igdT = 0, ranapR = 0, ranapT = 0;
+                if (data.pasien && !Array.isArray(data.pasien)) {
+                    rajalR = Number(data.pasien.rajal_realisasi || 0);
+                    rajalT = Number(data.pasien.rajal_target || 0);
+                    igdR = Number(data.pasien.igd_realisasi || 0);
+                    igdT = Number(data.pasien.igd_target || 0);
+                    ranapR = Number(data.pasien.ranap_realisasi || 0);
+                    ranapT = Number(data.pasien.ranap_target || 0);
+                } else {
+                    const ringkasanArr = data.ringkasan || data.pasien || [];
+                    ringkasanArr.forEach(item => {
+                        const kat = (item.kategori || '').toLowerCase();
+                        const r = Number(item.realisasi || 0);
+                        const t = Number(item.target || 0);
+                        if (kat.includes('rajal') || kat.includes('rawat jalan')) { rajalR = r; rajalT = t; }
+                        else if (kat.includes('igd') || kat.includes('darurat')) { igdR = r; igdT = t; }
+                        else if (kat.includes('ranap') || kat.includes('rawat inap')) { ranapR = r; ranapT = t; }
+                    });
+                }
+
+                const setPatientCard = (idTotal, idBadge, realisasi, target) => {
+                    document.getElementById(idTotal).innerText = `${realisasi.toLocaleString('id-ID')} / ${target.toLocaleString('id-ID')}`;
+                    const persen = target > 0 ? ((realisasi / target) * 100).toFixed(1) : 0;
+                    const badge = document.getElementById(idBadge);
+                    badge.innerText = `${persen}%`;
+                    badge.className = persen >= 100 
+                        ? 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                        : 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                };
+
+                setPatientCard('rajalTotalText', 'rajalPersenBadge', rajalR, rajalT);
+                setPatientCard('igdTotalText', 'igdPersenBadge', igdR, igdT);
+                setPatientCard('ranapTotalText', 'ranapPersenBadge', ranapR, ranapT);
+
+                // --- UPDATE DATA SPEEDOMETER IGD ---
+                igdGaugeChart.data.datasets[0].needleValue = igdR;
+                igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
+                igdGaugeChart.update();
+
+                const igdPersenVal = igdT > 0 ? ((igdR / igdT) * 100).toFixed(1) : 0;
+                const headerPersen = document.getElementById('igdHeaderPersen');
+                headerPersen.innerText = `${igdPersenVal}%`;
+                
+                // Ubah warna badge header IGD berdasarkan capaiannya
+                if (igdPersenVal >= 100) {
+                    headerPersen.className = "text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                } else {
+                    headerPersen.className = "text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                }
+                
+                document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
+
+                // --- FUNGSI UPDATE CHART LAINNYA ---
+                const updateChartWithHeader = (chart, dataArray, labelField, realField, targetField, totalTextId, persenBadgeId, isCurrency = false) => {
+                    if (!dataArray || !Array.isArray(dataArray)) dataArray = [];
+                    chart.data.labels = dataArray.map(i => i[labelField] || '-');
+                    chart.data.datasets[0].data = dataArray.map(i => Number(i[realField] || 0));
+                    chart.data.datasets[1].data = dataArray.map(i => Number(i[targetField] || 0));
+                    chart.update();
+
+                    const totalReal = dataArray.reduce((acc, curr) => acc + Number(curr[realField] || 0), 0);
+                    const totalTarget = dataArray.reduce((acc, curr) => acc + Number(curr[targetField] || 0), 0);
+                    const persen = totalTarget > 0 ? ((totalReal / totalTarget) * 100).toFixed(1) : 0;
+
+                    const fmt = (val) => isCurrency ? formatMiliar(val) : val.toLocaleString('id-ID');
+                    document.getElementById(totalTextId).innerText = `${fmt(totalReal)} / ${fmt(totalTarget)}`;
+                    
+                    const badge = document.getElementById(persenBadgeId);
+                    badge.innerText = `${persen}%`;
+                    badge.className = persen >= 100 
+                        ? 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400' 
+                        : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
+                };
+
+                updateChartWithHeader(topPoliChart, data.poli || data.topPoli, 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
+                updateChartWithHeader(kebidananChart, data.kebidanan, 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
+                updateChartWithHeader(kamarOperasiChart, data.kamarOperasi || data.operasi, 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
+                updateChartWithHeader(dokterMataChart, data.mata || data.dokterMata, 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
+
+                // BOR Rawat Inap
+                const borArray = data.bor || [];
+                borChart.data.labels = borArray.map(i => i.nama_ruangan || '-');
+                borChart.data.datasets[0].data = borArray.map(i => Number(i.bed_terisi || 0));
+                borChart.data.datasets[1].data = borArray.map(i => Number(i.kapasitas_bed || 0));
+                borChart.update();
+
+                const totalBed = borArray.reduce((a, b) => a + Number(b.bed_terisi || 0), 0);
+                const totalKapasitas = borArray.reduce((a, b) => a + Number(b.kapasitas_bed || 0), 0);
+                const borPersen = totalKapasitas > 0 ? ((totalBed / totalKapasitas) * 100).toFixed(1) : 0;
+                document.getElementById('borInfoText').innerText = `Isi: ${totalBed} / Kap: ${totalKapasitas}`;
+                document.getElementById('borTotalText').innerText = `${borPersen}%`;
+
+                // Tren Pendapatan
+                const trenArray = data.pendapatan || data.trenPendapatan || [];
+                pendapatanChart.data.labels = trenArray.map(i => {
+                    let t = i.tanggal || i.hari || '';
+                    return t ? t.split('T')[0] : '-';
+                });
+                pendapatanChart.data.datasets[0].data = trenArray.map(i => Number(i.realisasi || 0));
+                pendapatanChart.data.datasets[1].data = trenArray.map(i => Number(i.target || 0));
+                pendapatanChart.update();
+
+                const totalTrenReal = trenArray.reduce((a, b) => a + Number(b.realisasi || 0), 0);
+                const totalTrenTarget = trenArray.reduce((a, b) => a + Number(b.target || 0), 0) > 0 ? trenArray.reduce((a, b) => a + Number(b.target || 0), 0) : targetFin;
+                const trenPersen = totalTrenTarget > 0 ? ((totalTrenReal / totalTrenTarget) * 100).toFixed(1) : 0;
+                document.getElementById('trenTotalText').innerText = `Realisasi: ${formatMiliar(totalTrenReal)} / Target: ${formatMiliar(totalTrenTarget)}`;
+                const trenBadge = document.getElementById('trenPersenBadge');
+                trenBadge.innerText = `${trenPersen}%`;
+                trenBadge.className = trenPersen >= 100 
+                    ? 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400' 
+                    : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
+
+                // UPDATE TANGGAL & WAKTU
+                const now = new Date();
+                const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                document.getElementById('currentDateIndicator').innerText = now.toLocaleDateString('id-ID', options);
+                document.getElementById('lastUpdateText').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+
+            } catch (err) {
+                console.error('Gagal memperbarui dashboard:', err);
+            }
+        }
+
+        let syncInterval = setInterval(updateDashboardFromMySQL, 3000);
+        let isSyncActive = true;
+
+        function toggleSync() {
+            const btn = document.getElementById('toggleSyncBtn');
+            const icon = document.getElementById('syncIcon');
+            const text = document.getElementById('syncText');
+            
+            if (isSyncActive) {
+                clearInterval(syncInterval);
+                isSyncActive = false;
+                btn.className = "bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition";
+                icon.className = "fa-solid fa-play";
+                text.innerText = "Live: Dijeda";
+            } else {
+                syncInterval = setInterval(updateDashboardFromMySQL, 3000);
+                isSyncActive = true;
+                btn.className = "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition";
+                icon.className = "fa-solid fa-pause";
+                text.innerText = "Live: Aktif";
+                updateDashboardFromMySQL();
+            }
+        }
+
+        function manualRefresh() {
+            const icon = document.getElementById('refreshIcon');
+            icon.classList.add('fa-spin');
+            updateDashboardFromMySQL();
+            setTimeout(() => { icon.classList.remove('fa-spin'); }, 600);
+        }
+
+        updateDashboardFromMySQL();
+    </script>
+</body>
+</html>

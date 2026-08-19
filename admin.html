@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Kelola & Entry Data RS</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // AUTH GUARD SEDERHANA
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = '/login';
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            window.location.href = '/login';
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('w-64');
+            sidebar.classList.toggle('w-0');
+        }
+
+        function showToast(title, desc) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastDesc').innerText = desc;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function switchTab(tab) {
+            const btnEntry = document.getElementById('btnTabEntry');
+            const btnManage = document.getElementById('btnTabManage');
+            const tabEntry = document.getElementById('tabEntry');
+            const tabManage = document.getElementById('tabManage');
+
+            if (tab === 'entry') {
+                btnEntry.className = "bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition";
+                btnManage.className = "bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold transition";
+                tabEntry.classList.remove('hidden');
+                tabManage.classList.add('hidden');
+            } else {
+                btnManage.className = "bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition";
+                btnEntry.className = "bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold transition";
+                tabManage.classList.remove('hidden');
+                tabEntry.classList.add('hidden');
+                loadManageTables();
+            }
+        }
+
+        async function loadManageTables() {
+            try {
+                const res = await fetch('/api/admin/all-data');
+                const data = await res.json();
+
+                renderTable('tablePendapatanContainer', data.pendapatan, 'pendapatan', 'id', ['tanggal', 'target', 'realisasi'], 'editPendapatan');
+                renderTable('tableRingkasanContainer', data.ringkasan, 'ringkasan_harian', 'id', ['kategori', 'target', 'realisasi'], 'editRingkasan');
+                renderTable('tablePoliContainer', data.poli, 'rawat_jalan_poli', 'id', ['nama_poli', 'target', 'realisasi'], 'editPoli');
+                renderTable('tableOperasiContainer', data.operasi, 'kamar_operasi', 'id', ['spesialisasi', 'target', 'realisasi'], 'editOperasi');
+                renderTable('tableBorContainer', data.bor, 'rawat_inap_bor', 'id', ['nama_ruangan', 'bed_terisi', 'kapasitas_bed'], 'editBor');
+                renderTable('tableKebidananContainer', data.kebidanan, 'top_tindakan_kebidanan', 'id', ['nama_dokter', 'target', 'realisasi'], 'editKebidanan');
+                renderTable('tableMataContainer', data.mata, 'top_ok_mata', 'id', ['nama_dokter', 'target', 'realisasi'], 'editMata');
+
+            } catch (err) {
+                console.error("Gagal memuat data kelola:", err);
+            }
+        }
+
+        function renderTable(containerId, rows, tableName, idCol, columns, editFuncName) {
+            const container = document.getElementById(containerId);
+            if (!rows || rows.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 text-xs italic">Belum ada data.</p>`;
+                return;
+            }
+
+            let html = `<table class="w-full text-left border-collapse"><thead><tr class="border-b border-slate-800 text-slate-400">`;
+            columns.forEach(col => { html += `<th class="p-2 uppercase">${col}</th>`; });
+            html += `<th class="p-2 text-right">Aksi</th></tr></thead><tbody>`;
+
+            rows.forEach(row => {
+                html += `<tr class="border-b border-slate-800/50 hover:bg-slate-800/20">`;
+                columns.forEach(col => {
+                    let val = row[col];
+                    if (col === 'tanggal' && val) val = val.split('T')[0];
+                    html += `<td class="p-2 text-slate-200">${val !== null ? val : '-'}</td>`;
+                });
+                html += `<td class="p-2 text-right space-x-2">`;
+                
+                if (tableName === 'pendapatan') {
+                    html += `<button onclick="editPendapatan('${row[idCol]}', '${row.tanggal}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                } else if (tableName === 'ringkasan_harian') {
+                    html += `<button onclick="editRingkasan('${row[idCol]}', '${row.kategori}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                } else if (tableName === 'rawat_jalan_poli') {
+                    html += `<button onclick="editPoli('${row[idCol]}', '${row.nama_poli}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                } else if (tableName === 'kamar_operasi') {
+                    html += `<button onclick="editOperasi('${row[idCol]}', '${row.spesialisasi}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                } else if (tableName === 'rawat_inap_bor') {
+                    html += `<button onclick="editBor('${row[idCol]}', '${row.nama_ruangan}', '${row.bed_terisi}', '${row.kapasitas_bed}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                } else if (tableName === 'top_tindakan_kebidanan') {
+                    html += `<button onclick="editKebidanan('${row[idCol]}', '${row.nama_dokter}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                } else if (tableName === 'top_ok_mata') {
+                    html += `<button onclick="editMata('${row[idCol]}', '${row.nama_dokter}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                }
+
+                html += `<button onclick="deleteData('${tableName}', '${idCol}', '${row[idCol]}')" class="bg-rose-500/10 text-rose-400 px-2 py-1 rounded hover:bg-rose-500/20 font-semibold"><i class="fa-solid fa-trash"></i> Hapus</button>`;
+                html += `</td></tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        async function deleteData(table, idCol, idVal) {
+            if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) return;
+            try {
+                const res = await fetch('/api/admin/delete', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ table, idCol, idVal })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast("Berhasil Dihapus", "Data telah dihapus dari database.");
+                    loadManageTables();
+                } else {
+                    alert(result.error || "Gagal menghapus data.");
+                }
+            } catch (err) {
+                alert("Terjadi kesalahan koneksi server.");
+            }
+        }
+
+        function editPendapatan(id, tanggal, target, realisasi) {
+            switchTab('entry');
+            document.getElementById('edit_id_pendapatan').value = id;
+            document.getElementById('input_tanggal').value = tanggal && tanggal !== 'null' ? tanggal.split('T')[0] : '';
+            document.getElementById('target_pendapatan').value = target !== 'null' ? target : '';
+            document.getElementById('realisasi_pendapatan').value = realisasi !== 'null' ? realisasi : '';
+            document.getElementById('editModeIndicator').classList.remove('hidden');
+        }
+
+        function editRingkasan(id, kategori, target, realisasi) {
+    switchTab('entry');
+    
+    // Cari baris yang sesuai dengan kategori (IGD / Rawat Inap / Rawat Jalan) lalu isi otomatis nilainya
+    const rows = document.querySelectorAll('.pasien-row');
+    rows.forEach(r => {
+        const katInput = r.querySelector('.pasien-kategori');
+        if (katInput && katInput.value.toLowerCase() === kategori.toLowerCase()) {
+            r.querySelector('.pasien-target').value = target !== 'null' ? target : '';
+            r.querySelector('.pasien-realisasi').value = realisasi !== 'null' ? realisasi : '';
+        }
+    });
+
+    const indicator = document.getElementById('editModeIndicatorRingkasan');
+    if (indicator) {
+        indicator.classList.remove('hidden');
+    }
+}
+
+        function editPoli(id, nama, target, realisasi) {
+            switchTab('entry');
+            document.getElementById('edit_id_poli').value = id;
+            document.getElementById('edit_val_poli_nama').value = nama; // Cadangan hidden id
+
+            // Cari baris form Poli pertama dan isi datanya
+            const row = document.querySelector('.poli-row');
+            if (row) {
+                row.querySelector('.poli-nama').value = nama !== 'null' ? nama : '';
+                row.querySelector('.poli-target').value = target !== 'null' ? target : '';
+                row.querySelector('.poli-realisasi').value = realisasi !== 'null' ? realisasi : '';
+            }
+            
+            document.getElementById('editModeIndicatorPoli').classList.remove('hidden');
+            document.getElementById('poliContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function editOperasi(id, spesialisasi, target, realisasi) {
+            switchTab('entry');
+            document.getElementById('edit_id_operasi').value = id;
+            document.getElementById('edit_val_operasi_nama').value = spesialisasi;
+
+            const row = document.querySelector('.operasi-row');
+            if (row) {
+                row.querySelector('.operasi-nama').value = spesialisasi !== 'null' ? spesialisasi : '';
+                row.querySelector('.operasi-target').value = target !== 'null' ? target : '';
+                row.querySelector('.operasi-realisasi').value = realisasi !== 'null' ? realisasi : '';
+            }
+
+            document.getElementById('editModeIndicatorOperasi').classList.remove('hidden');
+            document.getElementById('operasiContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function editBor(id, ruangan, terisi, kapasitas) {
+            switchTab('entry');
+            document.getElementById('edit_id_bor').value = id;
+            document.getElementById('edit_val_bor_nama').value = ruangan;
+
+            const row = document.querySelector('.bor-row');
+            if (row) {
+                row.querySelector('.bor-nama').value = ruangan !== 'null' ? ruangan : '';
+                row.querySelector('.bor-terisi').value = terisi !== 'null' ? terisi : '';
+                row.querySelector('.bor-kapasitas').value = kapasitas !== 'null' ? kapasitas : '';
+            }
+
+            document.getElementById('editModeIndicatorBor').classList.remove('hidden');
+            document.getElementById('borContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function editKebidanan(id, nama, target, realisasi) {
+            switchTab('entry');
+            document.getElementById('edit_id_kebidanan').value = id;
+            document.getElementById('edit_val_kebidanan_nama').value = nama;
+
+            const row = document.querySelector('.kebidanan-row');
+            if (row) {
+                row.querySelector('.kebidanan-nama').value = nama !== 'null' ? nama : '';
+                row.querySelector('.kebidanan-target').value = target !== 'null' ? target : '';
+                row.querySelector('.kebidanan-realisasi').value = realisasi !== 'null' ? realisasi : '';
+            }
+
+            document.getElementById('editModeIndicatorKebidanan').classList.remove('hidden');
+            document.getElementById('kebidananContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function editMata(id, nama, target, realisasi) {
+            switchTab('entry');
+            document.getElementById('edit_id_mata').value = id;
+            document.getElementById('edit_val_mata_nama').value = nama;
+
+            const row = document.querySelector('.mata-row');
+            if (row) {
+                row.querySelector('.mata-nama').value = nama !== 'null' ? nama : '';
+                row.querySelector('.mata-target').value = target !== 'null' ? target : '';
+                row.querySelector('.mata-realisasi').value = realisasi !== 'null' ? realisasi : '';
+            }
+
+            document.getElementById('editModeIndicatorMata').classList.remove('hidden');
+            document.getElementById('mataContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+      document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('dataForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const tanggal = document.getElementById('input_tanggal').value;
+                if (!tanggal) {
+                    alert("Pilih tanggal terlebih dahulu!");
+                    return;
+                }
+                
+                const editIds = {
+                    pendapatan: document.getElementById('edit_id_pendapatan').value || null,
+                    ringkasan: document.getElementById('edit_id_ringkasan').value || null,
+                    poli: document.getElementById('edit_id_poli').value || null,
+                    operasi: document.getElementById('edit_id_operasi').value || null,
+                    bor: document.getElementById('edit_id_bor').value || null,
+                    kebidanan: document.getElementById('edit_id_kebidanan').value || null,
+                    mata: document.getElementById('edit_id_mata').value || null
+                };
+
+                const finansial = {
+                    target: document.getElementById('target_pendapatan').value ? Number(document.getElementById('target_pendapatan').value) : null,
+                    realisasi: document.getElementById('realisasi_pendapatan').value ? Number(document.getElementById('realisasi_pendapatan').value) : null
+                };
+
+                // FUNGSI YANG DIPERBARUI: Dijamin memblokir data 0 jika kotak input dikosongkan
+                const getRowsWithKey = (rowClass, nameClass, targetClass, realClass, hiddenNameId, dbKey) => {
+                    const rows = document.querySelectorAll('.' + rowClass);
+                    const data = [];
+                    
+                    rows.forEach(r => {
+                        const originalNameInput = hiddenNameId ? document.getElementById(hiddenNameId) : null;
+                        const nama = originalNameInput && originalNameInput.value ? originalNameInput.value : r.querySelector('.' + nameClass)?.value;
+                        
+                        // Tangkap isi input sebagai string, jika tidak ada jadikan string kosong
+                        const targetInput = r.querySelector('.' + targetClass)?.value || '';
+                        const realisasiInput = r.querySelector('.' + realClass)?.value || '';
+                        
+                        // KUNCI: Data HANYA didorong ke server jika nama ADA dan (Target ATAU Realisasi BENAR-BENAR DIISI)
+                        if (nama && (targetInput.trim() !== '' || realisasiInput.trim() !== '')) {
+                            data.push({ 
+                                [dbKey]: nama, 
+                                target: targetInput !== '' ? Number(targetInput) : 0, 
+                                realisasi: realisasiInput !== '' ? Number(realisasiInput) : 0 
+                            });
+                        }
+                    });
+                    return data;
+                };
+
+                const getBorRowsWithEdit = () => {
+                    const rows = document.querySelectorAll('.bor-row');
+                    const data = [];
+                    rows.forEach(r => {
+                        const hiddenName = document.getElementById('edit_val_bor_nama');
+                        const nama = hiddenName && hiddenName.value ? hiddenName.value : r.querySelector('.bor-nama')?.value;
+                        
+                        const terisiInput = r.querySelector('.bor-terisi')?.value || '';
+                        const kapasitasInput = r.querySelector('.bor-kapasitas')?.value || '';
+                        
+                        if (nama && (terisiInput.trim() !== '' || kapasitasInput.trim() !== '')) {
+                            data.push({ 
+                                nama_ruangan: nama, 
+                                bed_terisi: terisiInput !== '' ? Number(terisiInput) : 0, 
+                                kapasitas_bed: kapasitasInput !== '' ? Number(kapasitasInput) : 0 
+                            });
+                        }
+                    });
+                    return data;
+                };
+
+                // PENGAMBILAN DATA
+                // ringkasanPasien dipanggil menggunakan null agar nama kategori membaca dari HTML
+                const ringkasanPasien = getRowsWithKey('pasien-row', 'pasien-kategori', 'pasien-target', 'pasien-realisasi', null, 'kategori');
+                const poli = getRowsWithKey('poli-row', 'poli-nama', 'poli-target', 'poli-realisasi', 'edit_val_poli_nama', 'nama_poli');
+                const operasi = getRowsWithKey('operasi-row', 'operasi-nama', 'operasi-target', 'operasi-realisasi', 'edit_val_operasi_nama', 'spesialisasi');
+                const bor = getBorRowsWithEdit();
+                const kebidanan = getRowsWithKey('kebidanan-row', 'kebidanan-nama', 'kebidanan-target', 'kebidanan-realisasi', 'edit_val_kebidanan_nama', 'nama_dokter');
+                const mata = getRowsWithKey('mata-row', 'mata-nama', 'mata-target', 'mata-realisasi', 'edit_val_mata_nama', 'nama_dokter');
+
+                try {
+                    const res = await fetch('/api/entry', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ editIds, tanggal, finansial, ringkasanPasien, poli, operasi, bor, kebidanan, mata })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        showToast("Berhasil Disimpan!", "Data operasional telah diperbarui.");
+                        resetForm();
+                        loadManageTables(); 
+                    } else {
+                        alert(result.error || "Gagal menyimpan data.");
+                    }
+                } catch (err) {
+                    alert("Terjadi kesalahan jaringan.");
+                }
+            });
+        });
+        function addRow(containerId, classes, placeholders) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `grid grid-cols-1 md:grid-cols-3 gap-3 ${classes[0].split('-')[0]}-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center`;
+            div.innerHTML = `
+                <input type="text" class="${classes[0]} rounded-lg px-3 py-1.5 text-sm" placeholder="${placeholders[0]}">
+                <input type="number" class="${classes[1]} rounded-lg px-3 py-1.5 text-sm" placeholder="${placeholders[1]}">
+                <input type="number" class="${classes[2]} rounded-lg px-3 py-1.5 text-sm" placeholder="${placeholders[2]}">
+            `;
+            container.appendChild(div);
+        }
+
+        function addRowBOR() {
+            const container = document.getElementById('borContainer');
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-1 md:grid-cols-3 gap-3 bor-row bg-[#050814] p-3 rounded-xl border border-slate-800";
+            div.innerHTML = `
+                <input type="text" class="bor-nama rounded-lg px-3 py-1.5 text-sm" placeholder="Nama Ruangan">
+                <input type="number" class="bor-terisi rounded-lg px-3 py-1.5 text-sm" placeholder="Bed Terisi">
+                <input type="number" class="bor-kapasitas rounded-lg px-3 py-1.5 text-sm" placeholder="Kapasitas Bed">
+            `;
+            container.appendChild(div);
+        }
+
+        function resetForm() {
+            document.getElementById('dataForm').reset();
+            document.getElementById('edit_id_pendapatan').value = '';
+            document.getElementById('edit_id_ringkasan').value = '';
+            document.getElementById('edit_id_poli').value = '';
+            document.getElementById('edit_id_operasi').value = '';
+            document.getElementById('edit_id_bor').value = '';
+            document.getElementById('edit_id_kebidanan').value = '';
+            document.getElementById('edit_id_mata').value = '';
+
+            document.getElementById('edit_val_ringkasan_nama').value = '';
+            document.getElementById('edit_val_poli_nama').value = '';
+            document.getElementById('edit_val_operasi_nama').value = '';
+            document.getElementById('edit_val_bor_nama').value = '';
+            document.getElementById('edit_val_kebidanan_nama').value = '';
+            document.getElementById('edit_val_mata_nama').value = '';
+
+            document.getElementById('editModeIndicator').classList.add('hidden');
+            document.getElementById('editModeIndicatorRingkasan').classList.add('hidden');
+            document.getElementById('editModeIndicatorPoli').classList.add('hidden');
+            document.getElementById('editModeIndicatorOperasi').classList.add('hidden');
+            document.getElementById('editModeIndicatorBor').classList.add('hidden');
+            document.getElementById('editModeIndicatorKebidanan').classList.add('hidden');
+            document.getElementById('editModeIndicatorMata').classList.add('hidden');
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050814; color: #f1f5f9; }
+        .card-plasma { background: #0b132b; border: 1px solid #1e293b; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #050814; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        input[type="number"], input[type="text"], input[type="date"] { background-color: #050814; border: 1px solid #1e293b; color: #f8fafc; transition: all 0.2s; }
+        input[type="number"]:focus, input[type="text"]:focus, input[type="date"]:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+    </style>
+</head>
+<body class="flex h-screen w-screen overflow-hidden antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-64 bg-[#080e21] text-white flex flex-col justify-between shrink-0 border-r border-slate-800/80 z-20 h-full transition-all duration-300 overflow-hidden">
+        <div class="p-4 w-64 shrink-0">
+            <div class="mb-6 flex items-center gap-3">
+                <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-hospital text-sm text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-[11px] font-black tracking-wider text-white">RS CINTA KASIH</h1>
+                    <p class="text-[9px] text-blue-400 font-semibold tracking-widest mt-0.5">TZU CHI</p>
+                </div>
+            </div>
+            
+            <div class="space-y-1">
+                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 mb-1.5">Command Center</p>
+                <a href="/" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
+                    <i class="fa-solid fa-chart-pie w-4 text-center"></i> Display Dashboard
+                </a>
+                <a href="/admin" class="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-600/20 text-blue-400 font-semibold text-xs border border-blue-500/30 shadow-sm transition">
+                    <i class="fa-solid fa-pen-to-square w-4 text-center"></i> Entry & Kelola Data
+                </a>
+            </div>
+        </div>
+
+        <div class="p-4 w-64 shrink-0 space-y-3">
+            <div id="adminUserBadge" class="text-[10px] bg-[#050814] px-3 py-2 rounded-xl border border-slate-800 text-slate-300 font-medium truncate">
+                Admin: Aktif
+            </div>
+            <button onclick="logout()" class="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Keluar (Logout)
+            </button>
+            <div class="text-[9px] text-slate-600 text-center font-medium">&copy; 2026 SIMRS IT Department</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 h-full flex flex-col min-h-0 bg-plasma-bg relative">
+        <header class="bg-[#0b132b]/90 backdrop-blur-md px-6 py-4 border-b border-slate-800 shrink-0 z-30 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm" title="Sembunyikan/Tampilkan Menu">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+                <div>
+                    <h2 class="text-base md:text-lg font-extrabold text-white tracking-tight flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-blue-500"></i> PANEL KELOLA & ENTRY DATA RS
+                    </h2>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">Tambah, Edit, atau Hapus seluruh data grafik dan kunjungan pasien rumah sakit.</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="switchTab('entry')" id="btnTabEntry" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition">Form Entry</button>
+                <button onclick="switchTab('manage')" id="btnTabManage" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold transition">Edit & Hapus Data</button>
+            </div>
+        </header>
+
+        <div class="p-8 flex-1 overflow-y-auto space-y-6">
+            
+            <!-- TAB 1: FORM ENTRY / EDIT -->
+            <div id="tabEntry" class="space-y-6 max-w-5xl mx-auto pb-12">
+                <form id="dataForm" class="space-y-6">
+                    <input type="hidden" id="edit_id_pendapatan" value="">
+                    <input type="hidden" id="edit_id_ringkasan" value="">
+                    <input type="hidden" id="edit_val_ringkasan_nama" value="">
+                    <input type="hidden" id="edit_id_poli" value="">
+                    <input type="hidden" id="edit_val_poli_nama" value="">
+                    <input type="hidden" id="edit_id_operasi" value="">
+                    <input type="hidden" id="edit_val_operasi_nama" value="">
+                    <input type="hidden" id="edit_id_bor" value="">
+                    <input type="hidden" id="edit_val_bor_nama" value="">
+                    <input type="hidden" id="edit_id_kebidanan" value="">
+                    <input type="hidden" id="edit_val_kebidanan_nama" value="">
+                    <input type="hidden" id="edit_id_mata" value="">
+                    <input type="hidden" id="edit_val_mata_nama" value="">
+                    
+                    <div class="card-plasma p-6 rounded-2xl border border-blue-500/30">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-xs border border-blue-500/20"><i class="fa-regular fa-calendar-days"></i></div>
+                                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Tanggal Data</h3>
+                            </div>
+                            <span id="editModeIndicator" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Sedang Mode Edit Finansial</span>
+                        </div>
+                        <input type="date" id="input_tanggal" class="w-full md:w-1/3 rounded-lg px-3 py-2 text-sm">
+                    </div>
+
+                    <!-- FINANSIAL -->
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <div class="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
+                            <div class="w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xs border border-emerald-500/20"><i class="fa-solid fa-wallet"></i></div>
+                            <h3 class="font-bold text-white text-sm uppercase tracking-wider">KPI Finansial Harian (Pendapatan)</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Target Pendapatan</label>
+                                <input type="number" id="target_pendapatan" class="w-full rounded-lg px-3 py-2 text-sm" placeholder="Target Pendapatan">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Realisasi Pendapatan</label>
+                                <input type="number" id="realisasi_pendapatan" class="w-full rounded-lg px-3 py-2 text-sm" placeholder="Realisasi Pendapatan">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RINGKASAN PASIEN (IGD, Rawat Inap, Rawat Jalan) -->
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-xs border border-blue-500/20"><i class="fa-solid fa-users"></i></div>
+                                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Ringkasan Pasien (IGD, Rawat Inap, Rawat Jalan)</h3>
+                            </div>
+                            <span id="editModeIndicatorRingkasan" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
+                        </div>
+                        
+                        <div id="ringkasanContainer" class="space-y-3">
+                            <!-- Kategori: IGD -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                                <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200" value="IGD" readonly>
+                                <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target Pasien IGD">
+                                <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi Pasien IGD">
+                            </div>
+                            
+                            <!-- Kategori: Rawat Inap -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                                <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200" value="Rawat Inap" readonly>
+                                <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target Pasien Rawat Inap">
+                                <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi Pasien Rawat Inap">
+                            </div>
+
+                            <!-- Kategori: Rawat Jalan -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                                <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200" value="Rawat Jalan" readonly>
+                                <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target Pasien Rawat Jalan">
+                                <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi Pasien Rawat Jalan">
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="addRow('ringkasanContainer', ['pasien-kategori', 'pasien-target', 'pasien-realisasi'], ['Nama Kategori Lain', 'Target', 'Realisasi'])" class="mt-3 text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Tambah Kategori Lain
+                        </button>
+                    </div>
+
+                    <!-- TOP POLIKLINIK -->
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-xs border border-blue-500/20"><i class="fa-solid fa-hospital-user"></i></div>
+                                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Top Poliklinik</h3>
+                            </div>
+                            <span id="editModeIndicatorPoli" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
+                        </div>
+                        <div id="poliContainer" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 poli-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                                <input type="text" class="poli-nama rounded-lg px-3 py-1.5 text-sm" placeholder="Nama Poli">
+                                <input type="number" class="poli-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target">
+                                <input type="number" class="poli-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi">
+                            </div>
+                        </div>
+                        <button type="button" onclick="addRow('poliContainer', ['poli-nama', 'poli-target', 'poli-realisasi'], ['Nama Poli', 'Target', 'Realisasi'])" class="mt-3 text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Tambah Baris Poli
+                        </button>
+                    </div>
+
+                    <!-- KAMAR OPERASI -->
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-violet-500/10 text-violet-400 flex items-center justify-center text-xs border border-violet-500/20"><i class="fa-solid fa-bed-pulse"></i></div>
+                                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Kamar Operasi (OK)</h3>
+                            </div>
+                            <span id="editModeIndicatorOperasi" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
+                        </div>
+                        <div id="operasiContainer" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 operasi-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                                <input type="text" class="operasi-nama rounded-lg px-3 py-1.5 text-sm" placeholder="Spesialisasi">
+                                <input type="number" class="operasi-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target">
+                                <input type="number" class="operasi-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi">
+                            </div>
+                        </div>
+                        <button type="button" onclick="addRow('operasiContainer', ['operasi-nama', 'operasi-target', 'operasi-realisasi'], ['Spesialisasi', 'Target', 'Realisasi'])" class="mt-3 text-xs text-violet-400 hover:text-violet-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Tambah Baris Operasi
+                        </button>
+                    </div>
+
+                    <!-- BOR RAWAT INAP -->
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-slate-800 text-slate-300 flex items-center justify-center text-xs border border-slate-700"><i class="fa-solid fa-bed"></i></div>
+                                <h3 class="font-bold text-white text-sm uppercase tracking-wider">BOR Rawat Inap (Ruangan)</h3>
+                            </div>
+                            <span id="editModeIndicatorBor" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
+                        </div>
+                        <div id="borContainer" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bor-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                                <input type="text" class="bor-nama rounded-lg px-3 py-1.5 text-sm" placeholder="Nama Ruangan">
+                                <input type="number" class="bor-terisi rounded-lg px-3 py-1.5 text-sm" placeholder="Bed Terisi">
+                                <input type="number" class="bor-kapasitas rounded-lg px-3 py-1.5 text-sm" placeholder="Kapasitas Bed">
+                            </div>
+                        </div>
+                        <button type="button" onclick="addRowBOR()" class="mt-3 text-xs text-slate-400 hover:text-slate-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Tambah Baris Ruangan
+                        </button>
+                    </div>
+
+                    <!-- TOP KEBIDANAN -->
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-pink-500/10 text-pink-400 flex items-center justify-center text-xs border border-pink-500/20"><i class="fa-solid fa-baby"></i></div>
+                                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Top Kebidanan</h3>
+                            </div>
+                            <span id="editModeIndicatorKebidanan" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
+                        </div>
+                        <div id="kebidananContainer" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 kebidanan-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                                <input type="text" class="kebidanan-nama rounded-lg px-3 py-1.5 text-sm" placeholder="Nama Dokter / Tindakan">
+                                <input type="number" class="kebidanan-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target">
+                                <input type="number" class="kebidanan-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi">
+                            </div>
+                        </div>
+                        <button type="button" onclick="addRow('kebidananContainer', ['kebidanan-nama', 'kebidanan-target', 'kebidanan-realisasi'], ['Nama Dokter/Tindakan', 'Target', 'Realisasi'])" class="mt-3 text-xs text-pink-400 hover:text-pink-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Tambah Baris Kebidanan
+                        </button>
+                    </div>
+
+                    <!-- TOP OK MATA -->
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xs border border-cyan-500/20"><i class="fa-solid fa-eye"></i></div>
+                                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Top OK Mata</h3>
+                            </div>
+                            <span id="editModeIndicatorMata" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
+                        </div>
+                        <div id="mataContainer" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                                <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm" placeholder="Nama Dokter">
+                                <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target">
+                                <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi">
+                            </div>
+                        </div>
+                        <button type="button" onclick="addRow('mataContainer', ['mata-nama', 'mata-target', 'mata-realisasi'], ['Nama Dokter', 'Target', 'Realisasi'])" class="mt-3 text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Tambah Baris OK Mata
+                        </button>
+                    </div>
+
+                    <!-- SUBMIT BUTTON -->
+                    <div class="flex items-center justify-end gap-3 pt-4">
+                        <button type="button" onclick="resetForm()" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 bg-transparent border border-slate-700 hover:bg-slate-800 hover:text-white transition">Reset</button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan / Perbarui Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TAB 2: KELOLA / HAPUS DATA -->
+            <div id="tabManage" class="hidden space-y-6 max-w-6xl mx-auto pb-12">
+                <div class="card-plasma p-6 rounded-2xl">
+                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-wallet text-emerald-400"></i> Kelola Finansial (Target & Realisasi Pendapatan)
+                    </h3>
+                    <div id="tablePendapatanContainer" class="overflow-x-auto text-xs"></div>
+                </div>
+
+                <div class="card-plasma p-6 rounded-2xl">
+                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-blue-400"></i> Kelola Ringkasan Pasien
+                    </h3>
+                    <div id="tableRingkasanContainer" class="overflow-x-auto text-xs"></div>
+                </div>
+
+                <div class="card-plasma p-6 rounded-2xl">
+                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-table text-blue-400"></i> Kelola Data Poliklinik
+                    </h3>
+                    <div id="tablePoliContainer" class="overflow-x-auto text-xs"></div>
+                </div>
+
+                <div class="card-plasma p-6 rounded-2xl">
+                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-table text-violet-400"></i> Kelola Data Kamar Operasi
+                    </h3>
+                    <div id="tableOperasiContainer" class="overflow-x-auto text-xs"></div>
+                </div>
+
+                <div class="card-plasma p-6 rounded-2xl">
+                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-table text-slate-300"></i> Kelola Data BOR Ruangan
+                    </h3>
+                    <div id="tableBorContainer" class="overflow-x-auto text-xs"></div>
+                </div>
+
+                <div class="card-plasma p-6 rounded-2xl">
+                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-table text-pink-400"></i> Kelola Data Kebidanan
+                    </h3>
+                    <div id="tableKebidananContainer" class="overflow-x-auto text-xs"></div>
+                </div>
+
+                <div class="card-plasma p-6 rounded-2xl">
+                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-table text-cyan-400"></i> Kelola Data OK Mata
+                    </h3>
+                    <div id="tableMataContainer" class="overflow-x-auto text-xs"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TOAST NOTIFICATION -->
+        <div id="toast" class="absolute bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 ease-in-out bg-emerald-500/20 border border-emerald-500/50 backdrop-blur-md text-emerald-400 px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 z-50 pointer-events-none">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center"><i class="fa-solid fa-check"></i></div>
+            <div>
+                <h4 class="text-xs font-bold text-white" id="toastTitle">Berhasil Disimpan!</h4>
+                <p class="text-[10px]" id="toastDesc">Data telah diperbarui.</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
