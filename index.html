@@ -527,13 +527,28 @@
                 const data = await response.json();
                 if (!data) return;
 
-                // 1. Finansial / Pendapatan Harian
-                const fin = data.finansial || {};
-                const targetFin = Number(fin.target_pendapatan || fin.target || 0);
-                const realisasiFin = Number(fin.realisasi_pendapatan || fin.realisasi || 0);
+               // 1. Finansial / Pendapatan Harian (Kalkulasi dari Tren Harian)
+                const trenArray = data.pendapatan || data.trenPendapatan || [];
+                
+                let targetFin = 0;
+                let realisasiFin = 0;
+                
+                // Realisasi dijumlahkan (+=), Target ambil nilai tertinggi (Math.max)
+                trenArray.forEach(item => {
+                    realisasiFin += Number(item.realisasi || 0);
+                    targetFin = Math.max(targetFin, Number(item.target || 0));
+                });
+
+                // Fallback jika array kosong (menggunakan data finansial global)
+                if (targetFin === 0 && realisasiFin === 0 && data.finansial) {
+                    targetFin = Number(data.finansial.target_pendapatan || data.finansial.target || 0);
+                    realisasiFin = Number(data.finansial.realisasi_pendapatan || data.finansial.realisasi || 0);
+                }
+
                 const gapFin = realisasiFin - targetFin;
                 const persenFin = targetFin > 0 ? ((realisasiFin / targetFin) * 100).toFixed(1) : 0;
 
+                // Update Kartu Pendapatan Atas
                 document.getElementById('targetFinansialText').innerText = formatMiliar(targetFin);
                 document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
                 
@@ -655,30 +670,23 @@ updateChartWithHeader(dokterMataChart, aggregateData(data.mata || data.dokterMat
                 document.getElementById('borInfoText').innerText = `Isi: ${totalBed} / Kap: ${totalKapasitas}`;
                 document.getElementById('borTotalText').innerText = `${borPersen}%`;
 
-                // Tren Pendapatan
-                const trenArray = data.pendapatan || data.trenPendapatan || [];
+               // Tren Pendapatan (Memanfaatkan kalkulasi targetFin & realisasiFin dari atas)
                 pendapatanChart.data.labels = trenArray.map(i => {
                     let t = i.tanggal || i.hari || '';
                     return t ? t.split('T')[0] : '-';
                 });
-                pendapatanChart.data.datasets[0].data = trenArray.map(i => Number(i.target || 0));    // Index [0] ke Target
-                pendapatanChart.data.datasets[1].data = trenArray.map(i => Number(i.realisasi || 0)); // Index [1] ke Realisasi
+                pendapatanChart.data.datasets[0].data = trenArray.map(i => Number(i.target || 0));    
+                pendapatanChart.data.datasets[1].data = trenArray.map(i => Number(i.realisasi || 0)); 
                 pendapatanChart.update();
-
-                const totalTrenReal = trenArray.reduce((a, b) => a + Number(b.realisasi || 0), 0);
                 
-                // PENTING: Ambil angka target terbesar di bulan tersebut (tidak dijumlah)
-                const maxTargetTren = trenArray.reduce((max, curr) => Math.max(max, Number(curr.target || 0)), 0);
-                const totalTrenTarget = maxTargetTren > 0 ? maxTargetTren : targetFin;
-                
-                const trenPersen = totalTrenTarget > 0 ? ((totalTrenReal / totalTrenTarget) * 100).toFixed(1) : 0;
-                document.getElementById('trenTotalText').innerText = `Realisasi: ${formatMiliar(totalTrenReal)} / Target: ${formatMiliar(totalTrenTarget)}`;
+                // Update teks dan badge di header grafik bawah
+                document.getElementById('trenTotalText').innerText = `Realisasi: ${formatMiliar(realisasiFin)} / Target: ${formatMiliar(targetFin)}`;
                 const trenBadge = document.getElementById('trenPersenBadge');
-                trenBadge.innerText = `${trenPersen}%`;
-                trenBadge.className = trenPersen >= 100 
+                trenBadge.innerText = `${persenFin}%`;
+                trenBadge.className = persenFin >= 100 
                     ? 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400' 
                     : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
-
+                    
                 // UPDATE TANGGAL & WAKTU
                 const now = new Date();
                 const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
