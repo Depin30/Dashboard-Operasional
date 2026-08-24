@@ -11,12 +11,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname))); // Melayani file statis (HTML, CSS, JS)
 
-// Konfigurasi Koneksi Database MySQL (Sesuai permintaan Anda)
+
 const dbConfig = {
     host: 'localhost',
     user: 'root',
     password: 'root',
-    database: 'rs_dashboard'
+    database: 'rs_dashboard',
+    dateStrings: true
 };
 
 let pool;
@@ -50,26 +51,44 @@ app.get('/register', (req, res) => {
 // ==================== API DASHBOARD (index.html) ====================
 app.get('/api/dashboard', async (req, res) => {
     try {
-        const [pendapatan] = await pool.query('SELECT * FROM pendapatan ORDER BY tanggal ASC');
-        const [ringkasan] = await pool.query('SELECT * FROM ringkasan_harian');
-        const [poli] = await pool.query('SELECT * FROM rawat_jalan_poli');
-        const [operasi] = await pool.query('SELECT * FROM kamar_operasi');
-        const [bor] = await pool.query('SELECT * FROM rawat_inap_bor');
-        const [kebidanan] = await pool.query('SELECT * FROM top_tindakan_kebidanan');
-        const [mata] = await pool.query('SELECT * FROM top_ok_mata');
+        // Query filter: Hanya mengambil data yang tanggalnya di bulan & tahun berjalan
+        const filterBulanIni = `WHERE DATE_FORMAT(tanggal, '%Y-%m') = DATE_FORMAT(CURRENT_DATE(), '%Y-%m')`;
+
+        const [pendapatan] = await pool.query(`SELECT * FROM pendapatan ${filterBulanIni} ORDER BY tanggal ASC`);
+        const [ringkasan] = await pool.query(`SELECT * FROM ringkasan_harian ${filterBulanIni}`);
+        const [poli] = await pool.query(`SELECT * FROM rawat_jalan_poli ${filterBulanIni}`);
+        const [operasi] = await pool.query(`SELECT * FROM kamar_operasi ${filterBulanIni}`);
+        const [bor] = await pool.query(`SELECT * FROM rawat_inap_bor ${filterBulanIni}`);
+        const [kebidanan] = await pool.query(`SELECT * FROM top_tindakan_kebidanan ${filterBulanIni}`);
+        const [mata] = await pool.query(`SELECT * FROM top_ok_mata ${filterBulanIni}`);
 
         const latestFinansial = pendapatan.length > 0 ? pendapatan[pendapatan.length - 1] : { target: 0, realisasi: 0 };
+
+        // --- TAMBAHAN: Fungsi untuk menyamakan nama yang berbeda huruf kapital ---
+        const standardizeNames = (data, keyField) => {
+            const nameMap = {};
+            return data.map(item => {
+                if (!item[keyField]) return item;
+                const lower = item[keyField].toLowerCase(); // Jadikan huruf kecil untuk pencocokan
+                if (!nameMap[lower]) {
+                    nameMap[lower] = item[keyField]; // Simpan versi pertama yang ditemukan (misal: "Rara")
+                }
+                // Timpa dengan versi yang sudah diseragamkan
+                return { ...item, [keyField]: nameMap[lower] };
+            });
+        };
+        // -------------------------------------------------------------------------
 
         res.json({
             finansial: latestFinansial,
             pendapatan: pendapatan,
-            pasien: ringkasan,
-            ringkasan: ringkasan,
-            poli: poli,
-            kamarOperasi: operasi,
-            bor: bor,
-            kebidanan: kebidanan,
-            mata: mata
+            pasien: standardizeNames(ringkasan, 'kategori'),
+            ringkasan: standardizeNames(ringkasan, 'kategori'),
+            poli: standardizeNames(poli, 'nama_poli'),
+            kamarOperasi: standardizeNames(operasi, 'spesialisasi'),
+            bor: standardizeNames(bor, 'nama_ruangan'),
+            kebidanan: standardizeNames(kebidanan, 'nama_dokter'),
+            mata: standardizeNames(mata, 'nama_dokter')
         });
     } catch (err) {
         console.error("Error /api/dashboard:", err);
@@ -125,8 +144,9 @@ app.delete('/api/admin/delete', async (req, res) => {
 app.post('/api/entry', async (req, res) => {
     const { editIds, tanggal, finansial, ringkasanPasien, poli, operasi, bor, kebidanan, mata } = req.body;
     
-    // Fallback otomatis ke tanggal hari ini jika form tanggal kosong
-    const formTanggal = tanggal || new Date().toISOString().split('T')[0];
+    // Mengambil tanggal lokal format YYYY-MM-DD (Sesuai WIB)
+const localDate = new Date().toLocaleDateString('sv-SE'); 
+const formTanggal = tanggal || localDate;
     
     try {
         // 1. Tanggal & Finansial (Pendapatan)
@@ -160,10 +180,9 @@ app.post('/api/entry', async (req, res) => {
                 } else {
                     // Cek apakah kategori sudah ada berdasarkan nama dan tanggal untuk menghindari duplikat harian
                     const [existing] = await pool.query(
-                        `SELECT id FROM ?? WHERE ?? = ? AND tanggal = ?`, 
-                        [tableName, nameCol, nameVal, formTanggal]
-                    );
-
+    `SELECT id FROM ?? WHERE LOWER(??) = LOWER(?) AND tanggal = ?`, 
+    [tableName, nameCol, nameVal, formTanggal]
+);
                     if (existing.length > 0) {
                         await pool.query(
                             `UPDATE ?? SET target = ?, realisasi = ? WHERE id = ?`,
@@ -196,10 +215,9 @@ app.post('/api/entry', async (req, res) => {
                     );
                 } else {
                     const [existing] = await pool.query(
-                        'SELECT id FROM rawat_inap_bor WHERE nama_ruangan = ? AND tanggal = ?', 
-                        [ruang, formTanggal]
-                    );
-
+    'SELECT id FROM rawat_inap_bor WHERE LOWER(nama_ruangan) = LOWER(?) AND tanggal = ?', 
+    [ruang, formTanggal]
+);
                     if (existing.length > 0) {
                         await pool.query(
                             'UPDATE rawat_inap_bor SET bed_terisi = ?, kapasitas_bed = ? WHERE id = ?',

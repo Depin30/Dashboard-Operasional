@@ -54,22 +54,58 @@
                 btnEntry.className = "bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold transition";
                 tabManage.classList.remove('hidden');
                 tabEntry.classList.add('hidden');
+                
+                // Panggil data dari database
                 loadManageTables();
+                
+                // Otomatis buka navbar Finansial agar tidak kosong
+                switchManageTab('pendapatan'); 
+            }
+        }
+
+        // FUNGSI UNTUK NAVBAR
+        function switchManageTab(tabId) {
+            // 1. Sembunyikan semua tabel
+            const contents = document.querySelectorAll('.manage-content');
+            contents.forEach(el => {
+                el.classList.remove('block');
+                el.classList.add('hidden');
+            });
+
+            // 2. Tampilkan tabel yang dipilih
+            const targetContent = document.getElementById('manage_' + tabId);
+            if(targetContent) {
+                targetContent.classList.remove('hidden');
+                targetContent.classList.add('block');
+            }
+
+            // 3. Reset warna tombol
+            const buttons = document.querySelectorAll('.manage-tab-btn');
+            buttons.forEach(btn => {
+                btn.className = "manage-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap";
+            });
+
+            // 4. Warnai tombol yang aktif
+            const activeBtn = document.getElementById('btnManage_' + tabId);
+            if(activeBtn) {
+                activeBtn.className = "manage-tab-btn bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shadow-md shadow-blue-900/20";
             }
         }
 
         async function loadManageTables() {
+            
             try {
                 const res = await fetch('/api/admin/all-data');
                 const data = await res.json();
 
+                // Menambahkan 'tanggal' ke dalam kolom render tabel
                 renderTable('tablePendapatanContainer', data.pendapatan, 'pendapatan', 'id', ['tanggal', 'target', 'realisasi'], 'editPendapatan');
-                renderTable('tableRingkasanContainer', data.ringkasan, 'ringkasan_harian', 'id', ['kategori', 'target', 'realisasi'], 'editRingkasan');
-                renderTable('tablePoliContainer', data.poli, 'rawat_jalan_poli', 'id', ['nama_poli', 'target', 'realisasi'], 'editPoli');
-                renderTable('tableOperasiContainer', data.operasi, 'kamar_operasi', 'id', ['spesialisasi', 'target', 'realisasi'], 'editOperasi');
-                renderTable('tableBorContainer', data.bor, 'rawat_inap_bor', 'id', ['nama_ruangan', 'bed_terisi', 'kapasitas_bed'], 'editBor');
-                renderTable('tableKebidananContainer', data.kebidanan, 'top_tindakan_kebidanan', 'id', ['nama_dokter', 'target', 'realisasi'], 'editKebidanan');
-                renderTable('tableMataContainer', data.mata, 'top_ok_mata', 'id', ['nama_dokter', 'target', 'realisasi'], 'editMata');
+                renderTable('tableRingkasanContainer', data.ringkasan, 'ringkasan_harian', 'id', ['tanggal', 'kategori', 'target', 'realisasi'], 'editRingkasan');
+                renderTable('tablePoliContainer', data.poli, 'rawat_jalan_poli', 'id', ['tanggal', 'nama_poli', 'target', 'realisasi'], 'editPoli');
+                renderTable('tableOperasiContainer', data.operasi, 'kamar_operasi', 'id', ['tanggal', 'spesialisasi', 'target', 'realisasi'], 'editOperasi');
+                renderTable('tableBorContainer', data.bor, 'rawat_inap_bor', 'id', ['tanggal', 'nama_ruangan', 'bed_terisi', 'kapasitas_bed'], 'editBor');
+                renderTable('tableKebidananContainer', data.kebidanan, 'top_tindakan_kebidanan', 'id', ['tanggal', 'nama_dokter', 'target', 'realisasi'], 'editKebidanan');
+                renderTable('tableMataContainer', data.mata, 'top_ok_mata', 'id', ['tanggal', 'nama_dokter', 'target', 'realisasi'], 'editMata');
 
             } catch (err) {
                 console.error("Gagal memuat data kelola:", err);
@@ -96,20 +132,21 @@
                 });
                 html += `<td class="p-2 text-right space-x-2">`;
                 
+                // Menyertakan parameter row.tanggal pada setiap fungsi edit
                 if (tableName === 'pendapatan') {
                     html += `<button onclick="editPendapatan('${row[idCol]}', '${row.tanggal}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
                 } else if (tableName === 'ringkasan_harian') {
-                    html += `<button onclick="editRingkasan('${row[idCol]}', '${row.kategori}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                    html += `<button onclick="editRingkasan('${row[idCol]}', '${row.tanggal}', '${row.kategori}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
                 } else if (tableName === 'rawat_jalan_poli') {
-                    html += `<button onclick="editPoli('${row[idCol]}', '${row.nama_poli}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                    html += `<button onclick="editPoli('${row[idCol]}', '${row.tanggal}', '${row.nama_poli}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
                 } else if (tableName === 'kamar_operasi') {
-                    html += `<button onclick="editOperasi('${row[idCol]}', '${row.spesialisasi}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                    html += `<button onclick="editOperasi('${row[idCol]}', '${row.tanggal}', '${row.spesialisasi}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
                 } else if (tableName === 'rawat_inap_bor') {
-                    html += `<button onclick="editBor('${row[idCol]}', '${row.nama_ruangan}', '${row.bed_terisi}', '${row.kapasitas_bed}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                    html += `<button onclick="editBor('${row[idCol]}', '${row.tanggal}', '${row.nama_ruangan}', '${row.bed_terisi}', '${row.kapasitas_bed}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
                 } else if (tableName === 'top_tindakan_kebidanan') {
-                    html += `<button onclick="editKebidanan('${row[idCol]}', '${row.nama_dokter}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                    html += `<button onclick="editKebidanan('${row[idCol]}', '${row.tanggal}', '${row.nama_dokter}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
                 } else if (tableName === 'top_ok_mata') {
-                    html += `<button onclick="editMata('${row[idCol]}', '${row.nama_dokter}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
+                    html += `<button onclick="editMata('${row[idCol]}', '${row.tanggal}', '${row.nama_dokter}', '${row.target}', '${row.realisasi}')" class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/20 font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>`;
                 }
 
                 html += `<button onclick="deleteData('${tableName}', '${idCol}', '${row[idCol]}')" class="bg-rose-500/10 text-rose-400 px-2 py-1 rounded hover:bg-rose-500/20 font-semibold"><i class="fa-solid fa-trash"></i> Hapus</button>`;
@@ -139,6 +176,7 @@
             }
         }
 
+        // Fungsi Edit dengan Tanggal Otomatis Terisi
         function editPendapatan(id, tanggal, target, realisasi) {
             switchTab('entry');
             document.getElementById('edit_id_pendapatan').value = id;
@@ -148,31 +186,31 @@
             document.getElementById('editModeIndicator').classList.remove('hidden');
         }
 
-        function editRingkasan(id, kategori, target, realisasi) {
-    switchTab('entry');
-    
-    // Cari baris yang sesuai dengan kategori (IGD / Rawat Inap / Rawat Jalan) lalu isi otomatis nilainya
-    const rows = document.querySelectorAll('.pasien-row');
-    rows.forEach(r => {
-        const katInput = r.querySelector('.pasien-kategori');
-        if (katInput && katInput.value.toLowerCase() === kategori.toLowerCase()) {
-            r.querySelector('.pasien-target').value = target !== 'null' ? target : '';
-            r.querySelector('.pasien-realisasi').value = realisasi !== 'null' ? realisasi : '';
+        function editRingkasan(id, tanggal, kategori, target, realisasi) {
+            switchTab('entry');
+            document.getElementById('input_tanggal').value = tanggal && tanggal !== 'null' ? tanggal.split('T')[0] : '';
+            
+            const rows = document.querySelectorAll('.pasien-row');
+            rows.forEach(r => {
+                const katInput = r.querySelector('.pasien-kategori');
+                if (katInput && katInput.value.toLowerCase() === kategori.toLowerCase()) {
+                    r.querySelector('.pasien-target').value = target !== 'null' ? target : '';
+                    r.querySelector('.pasien-realisasi').value = realisasi !== 'null' ? realisasi : '';
+                }
+            });
+
+            const indicator = document.getElementById('editModeIndicatorRingkasan');
+            if (indicator) {
+                indicator.classList.remove('hidden');
+            }
         }
-    });
 
-    const indicator = document.getElementById('editModeIndicatorRingkasan');
-    if (indicator) {
-        indicator.classList.remove('hidden');
-    }
-}
-
-        function editPoli(id, nama, target, realisasi) {
+        function editPoli(id, tanggal, nama, target, realisasi) {
             switchTab('entry');
             document.getElementById('edit_id_poli').value = id;
-            document.getElementById('edit_val_poli_nama').value = nama; // Cadangan hidden id
+            document.getElementById('edit_val_poli_nama').value = nama;
+            document.getElementById('input_tanggal').value = tanggal && tanggal !== 'null' ? tanggal.split('T')[0] : '';
 
-            // Cari baris form Poli pertama dan isi datanya
             const row = document.querySelector('.poli-row');
             if (row) {
                 row.querySelector('.poli-nama').value = nama !== 'null' ? nama : '';
@@ -184,10 +222,11 @@
             document.getElementById('poliContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function editOperasi(id, spesialisasi, target, realisasi) {
+        function editOperasi(id, tanggal, spesialisasi, target, realisasi) {
             switchTab('entry');
             document.getElementById('edit_id_operasi').value = id;
             document.getElementById('edit_val_operasi_nama').value = spesialisasi;
+            document.getElementById('input_tanggal').value = tanggal && tanggal !== 'null' ? tanggal.split('T')[0] : '';
 
             const row = document.querySelector('.operasi-row');
             if (row) {
@@ -200,10 +239,11 @@
             document.getElementById('operasiContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function editBor(id, ruangan, terisi, kapasitas) {
+        function editBor(id, tanggal, ruangan, terisi, kapasitas) {
             switchTab('entry');
             document.getElementById('edit_id_bor').value = id;
             document.getElementById('edit_val_bor_nama').value = ruangan;
+            document.getElementById('input_tanggal').value = tanggal && tanggal !== 'null' ? tanggal.split('T')[0] : '';
 
             const row = document.querySelector('.bor-row');
             if (row) {
@@ -216,10 +256,11 @@
             document.getElementById('borContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function editKebidanan(id, nama, target, realisasi) {
+        function editKebidanan(id, tanggal, nama, target, realisasi) {
             switchTab('entry');
             document.getElementById('edit_id_kebidanan').value = id;
             document.getElementById('edit_val_kebidanan_nama').value = nama;
+            document.getElementById('input_tanggal').value = tanggal && tanggal !== 'null' ? tanggal.split('T')[0] : '';
 
             const row = document.querySelector('.kebidanan-row');
             if (row) {
@@ -232,10 +273,11 @@
             document.getElementById('kebidananContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function editMata(id, nama, target, realisasi) {
+        function editMata(id, tanggal, nama, target, realisasi) {
             switchTab('entry');
             document.getElementById('edit_id_mata').value = id;
             document.getElementById('edit_val_mata_nama').value = nama;
+            document.getElementById('input_tanggal').value = tanggal && tanggal !== 'null' ? tanggal.split('T')[0] : '';
 
             const row = document.querySelector('.mata-row');
             if (row) {
@@ -248,7 +290,14 @@
             document.getElementById('mataContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-      document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- TAMBAHKAN 4 BARIS INI UNTUK AUTO-FILL TANGGAL ---
+            const inputTanggal = document.getElementById('input_tanggal');
+            if (inputTanggal) {
+                inputTanggal.value = new Date().toLocaleDateString('sv-SE');
+            }
+            // -----------------------------------------------------
+
             document.getElementById('dataForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
@@ -257,6 +306,7 @@
                     alert("Pilih tanggal terlebih dahulu!");
                     return;
                 }
+                
                 
                 const editIds = {
                     pendapatan: document.getElementById('edit_id_pendapatan').value || null,
@@ -273,7 +323,6 @@
                     realisasi: document.getElementById('realisasi_pendapatan').value ? Number(document.getElementById('realisasi_pendapatan').value) : null
                 };
 
-                // FUNGSI YANG DIPERBARUI: Dijamin memblokir data 0 jika kotak input dikosongkan
                 const getRowsWithKey = (rowClass, nameClass, targetClass, realClass, hiddenNameId, dbKey) => {
                     const rows = document.querySelectorAll('.' + rowClass);
                     const data = [];
@@ -282,11 +331,9 @@
                         const originalNameInput = hiddenNameId ? document.getElementById(hiddenNameId) : null;
                         const nama = originalNameInput && originalNameInput.value ? originalNameInput.value : r.querySelector('.' + nameClass)?.value;
                         
-                        // Tangkap isi input sebagai string, jika tidak ada jadikan string kosong
                         const targetInput = r.querySelector('.' + targetClass)?.value || '';
                         const realisasiInput = r.querySelector('.' + realClass)?.value || '';
                         
-                        // KUNCI: Data HANYA didorong ke server jika nama ADA dan (Target ATAU Realisasi BENAR-BENAR DIISI)
                         if (nama && (targetInput.trim() !== '' || realisasiInput.trim() !== '')) {
                             data.push({ 
                                 [dbKey]: nama, 
@@ -319,8 +366,6 @@
                     return data;
                 };
 
-                // PENGAMBILAN DATA
-                // ringkasanPasien dipanggil menggunakan null agar nama kategori membaca dari HTML
                 const ringkasanPasien = getRowsWithKey('pasien-row', 'pasien-kategori', 'pasien-target', 'pasien-realisasi', null, 'kategori');
                 const poli = getRowsWithKey('poli-row', 'poli-nama', 'poli-target', 'poli-realisasi', 'edit_val_poli_nama', 'nama_poli');
                 const operasi = getRowsWithKey('operasi-row', 'operasi-nama', 'operasi-target', 'operasi-realisasi', 'edit_val_operasi_nama', 'spesialisasi');
@@ -347,6 +392,7 @@
                 }
             });
         });
+
         function addRow(containerId, classes, placeholders) {
             const container = document.getElementById(containerId);
             const div = document.createElement('div');
@@ -373,6 +419,11 @@
 
         function resetForm() {
             document.getElementById('dataForm').reset();
+            
+            // --- TAMBAHKAN BARIS INI ---
+            document.getElementById('input_tanggal').value = new Date().toLocaleDateString('sv-SE');
+            // ---------------------------
+
             document.getElementById('edit_id_pendapatan').value = '';
             document.getElementById('edit_id_ringkasan').value = '';
             document.getElementById('edit_id_poli').value = '';
@@ -381,6 +432,7 @@
             document.getElementById('edit_id_kebidanan').value = '';
             document.getElementById('edit_id_mata').value = '';
 
+        
             document.getElementById('edit_val_ringkasan_nama').value = '';
             document.getElementById('edit_val_poli_nama').value = '';
             document.getElementById('edit_val_operasi_nama').value = '';
@@ -480,7 +532,7 @@
                     <input type="hidden" id="edit_val_operasi_nama" value="">
                     <input type="hidden" id="edit_id_bor" value="">
                     <input type="hidden" id="edit_val_bor_nama" value="">
-                    <input type="hidden" id="edit_id_kebidanan" value="">
+                    <input type="hidden" id="edit_id_kebidanan" value=""> 
                     <input type="hidden" id="edit_val_kebidanan_nama" value="">
                     <input type="hidden" id="edit_id_mata" value="">
                     <input type="hidden" id="edit_val_mata_nama" value="">
@@ -525,21 +577,18 @@
                         </div>
                         
                         <div id="ringkasanContainer" class="space-y-3">
-                            <!-- Kategori: IGD -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
                                 <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200" value="IGD" readonly>
                                 <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target Pasien IGD">
                                 <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi Pasien IGD">
                             </div>
                             
-                            <!-- Kategori: Rawat Inap -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
                                 <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200" value="Rawat Inap" readonly>
                                 <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target Pasien Rawat Inap">
                                 <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm" placeholder="Realisasi Pasien Rawat Inap">
                             </div>
 
-                            <!-- Kategori: Rawat Jalan -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
                                 <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200" value="Rawat Jalan" readonly>
                                 <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm" placeholder="Target Pasien Rawat Jalan">
@@ -667,60 +716,86 @@
                 </form>
             </div>
 
-            <!-- TAB 2: KELOLA / HAPUS DATA -->
+          <!-- TAB 2: KELOLA / HAPUS DATA -->
             <div id="tabManage" class="hidden space-y-6 max-w-6xl mx-auto pb-12">
-                <div class="card-plasma p-6 rounded-2xl">
-                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-wallet text-emerald-400"></i> Kelola Finansial (Target & Realisasi Pendapatan)
-                    </h3>
-                    <div id="tablePendapatanContainer" class="overflow-x-auto text-xs"></div>
+                
+                <!-- NAVBAR SUB-MENU (Menu Horizontal) -->
+                <div class="flex overflow-x-auto gap-2 pb-2 border-b border-slate-800 hide-scroll">
+                    <button type="button" onclick="switchManageTab('pendapatan')" id="btnManage_pendapatan" class="manage-tab-btn bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shadow-md shadow-blue-900/20">Finansial</button>
+                    <button type="button" onclick="switchManageTab('ringkasan')" id="btnManage_ringkasan" class="manage-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">Ringkasan Pasien</button>
+                    <button type="button" onclick="switchManageTab('poli')" id="btnManage_poli" class="manage-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">Poliklinik</button>
+                    <button type="button" onclick="switchManageTab('operasi')" id="btnManage_operasi" class="manage-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">Kamar Operasi</button>
+                    <button type="button" onclick="switchManageTab('bor')" id="btnManage_bor" class="manage-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">BOR Ruangan</button>
+                    <button type="button" onclick="switchManageTab('kebidanan')" id="btnManage_kebidanan" class="manage-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">Kebidanan</button>
+                    <button type="button" onclick="switchManageTab('mata')" id="btnManage_mata" class="manage-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">OK Mata</button>
                 </div>
 
-                <div class="card-plasma p-6 rounded-2xl">
-                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-users text-blue-400"></i> Kelola Ringkasan Pasien
-                    </h3>
-                    <div id="tableRingkasanContainer" class="overflow-x-auto text-xs"></div>
+                <!-- KONTEN TABEL -->
+                <div id="manage_pendapatan" class="manage-content block">
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-wallet text-emerald-400"></i> Kelola Finansial
+                        </h3>
+                        <!-- Kembali menggunakan <div> sebagai wadah, persis seperti yang diminta fungsi Anda -->
+                        <div id="tablePendapatanContainer" class="overflow-x-auto text-xs"></div>
+                    </div>
                 </div>
 
-                <div class="card-plasma p-6 rounded-2xl">
-                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-table text-blue-400"></i> Kelola Data Poliklinik
-                    </h3>
-                    <div id="tablePoliContainer" class="overflow-x-auto text-xs"></div>
+                <div id="manage_ringkasan" class="manage-content hidden">
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-blue-400"></i> Kelola Ringkasan Pasien
+                        </h3>
+                        <div id="tableRingkasanContainer" class="overflow-x-auto text-xs"></div>
+                    </div>
                 </div>
 
-                <div class="card-plasma p-6 rounded-2xl">
-                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-table text-violet-400"></i> Kelola Data Kamar Operasi
-                    </h3>
-                    <div id="tableOperasiContainer" class="overflow-x-auto text-xs"></div>
+                <div id="manage_poli" class="manage-content hidden">
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-table text-blue-400"></i> Kelola Data Poliklinik
+                        </h3>
+                        <div id="tablePoliContainer" class="overflow-x-auto text-xs"></div>
+                    </div>
                 </div>
 
-                <div class="card-plasma p-6 rounded-2xl">
-                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-table text-slate-300"></i> Kelola Data BOR Ruangan
-                    </h3>
-                    <div id="tableBorContainer" class="overflow-x-auto text-xs"></div>
+                <div id="manage_operasi" class="manage-content hidden">
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-bed-pulse text-violet-400"></i> Kelola Data Kamar Operasi
+                        </h3>
+                        <div id="tableOperasiContainer" class="overflow-x-auto text-xs"></div>
+                    </div>
                 </div>
 
-                <div class="card-plasma p-6 rounded-2xl">
-                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-table text-pink-400"></i> Kelola Data Kebidanan
-                    </h3>
-                    <div id="tableKebidananContainer" class="overflow-x-auto text-xs"></div>
+                <div id="manage_bor" class="manage-content hidden">
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-bed text-slate-300"></i> Kelola Data BOR Ruangan
+                        </h3>
+                        <div id="tableBorContainer" class="overflow-x-auto text-xs"></div>
+                    </div>
                 </div>
 
-                <div class="card-plasma p-6 rounded-2xl">
-                    <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-table text-cyan-400"></i> Kelola Data OK Mata
-                    </h3>
-                    <div id="tableMataContainer" class="overflow-x-auto text-xs"></div>
+                <div id="manage_kebidanan" class="manage-content hidden">
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-baby text-pink-400"></i> Kelola Data Kebidanan
+                        </h3>
+                        <div id="tableKebidananContainer" class="overflow-x-auto text-xs"></div>
+                    </div>
                 </div>
+
+                <div id="manage_mata" class="manage-content hidden">
+                    <div class="card-plasma p-6 rounded-2xl">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-cyan-400"></i> Kelola Data OK Mata
+                        </h3>
+                        <div id="tableMataContainer" class="overflow-x-auto text-xs"></div>
+                    </div>
+                </div>
+
             </div>
-
-        </div>
-
         <!-- TOAST NOTIFICATION -->
         <div id="toast" class="absolute bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 ease-in-out bg-emerald-500/20 border border-emerald-500/50 backdrop-blur-md text-emerald-400 px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 z-50 pointer-events-none">
             <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center"><i class="fa-solid fa-check"></i></div>

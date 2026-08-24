@@ -413,28 +413,28 @@
             scales: { y: { grid: { display: false } }, x: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } }
         };
 
-        // INISIALISASI CHART.JS (Poli, Kebidanan, OK, BOR, Mata)
+      // INISIALISASI CHART.JS (Poli, Kebidanan, OK, BOR, Mata)
         const topPoliChart = new Chart(document.getElementById('topPoliChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Realisasi', data: [], backgroundColor: '#3b82f6', borderRadius: 3, borderSkipped: false },
-                { label: 'Target', data: [], backgroundColor: '#1e3a8a', borderRadius: 3, borderSkipped: false }
+                { label: 'Target', data: [], backgroundColor: '#1e3a8a', borderRadius: 3, borderSkipped: false },
+                { label: 'Realisasi', data: [], backgroundColor: '#3b82f6', borderRadius: 3, borderSkipped: false }
             ]}, options: commonBarOptions
         });
 
         const kebidananChart = new Chart(document.getElementById('kebidananChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Realisasi', data: [], backgroundColor: '#ec4899', borderRadius: 3, borderSkipped: false },
-                { label: 'Target', data: [], backgroundColor: '#831843', borderRadius: 3, borderSkipped: false }
+                { label: 'Target', data: [], backgroundColor: '#831843', borderRadius: 3, borderSkipped: false },
+                { label: 'Realisasi', data: [], backgroundColor: '#ec4899', borderRadius: 3, borderSkipped: false }
             ]}, options: commonHorizontalOptions
         });
 
         const kamarOperasiChart = new Chart(document.getElementById('kamarOperasiChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Realisasi', data: [], backgroundColor: '#8b5cf6', borderRadius: 3, borderSkipped: false },
-                { label: 'Target', data: [], backgroundColor: '#4c1d95', borderRadius: 3, borderSkipped: false }
+                { label: 'Target', data: [], backgroundColor: '#4c1d95', borderRadius: 3, borderSkipped: false },
+                { label: 'Realisasi', data: [], backgroundColor: '#8b5cf6', borderRadius: 3, borderSkipped: false }
             ]}, options: commonBarOptions
         });
 
@@ -444,47 +444,38 @@
             data: {
                 labels: ['Aman', 'Waspada', 'Tinggi'],
                 datasets: [{ 
-                    // Pembagian ukuran cincin (sepertiga rata)
                     data: [33.3, 33.3, 33.4], 
                     backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(245, 158, 11, 0.85)', 'rgba(225, 29, 72, 0.85)'],
                     borderWidth: 3,
-                    borderColor: '#0b132b', // Warna border disamakan dgn background agar terlihat seperti celah/gap
-                    borderRadius: 6, // Ujung tumpul (Modern UI)
+                    borderColor: '#0b132b',
+                    borderRadius: 6,
                     needleValue: 0, 
                     minValue: 0, 
                     maxValue: 1000 
                 }]
             },
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                circumference: 180, 
-                rotation: 270, 
-                cutout: '80%', // Cincin yang tipis elegan
+                responsive: true, maintainAspectRatio: false, circumference: 180, rotation: 270, cutout: '80%', 
                 animation: { duration: 1000, easing: 'easeOutQuart' }, 
-                plugins: { 
-                    legend: { display: false }, 
-                    tooltip: { enabled: false }, 
-                    datalabels: { display: false } 
-                },
+                plugins: { legend: { display: false }, tooltip: { enabled: false }, datalabels: { display: false } },
                 layout: { padding: { bottom: 10 } }
             },
-            plugins: [modernGaugeNeedle] // Pasang plugin jarum baru
+            plugins: [modernGaugeNeedle]
         });
 
         const borChart = new Chart(document.getElementById('borChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Bed Terisi', data: [], backgroundColor: '#0ea5e9', borderRadius: 3, borderSkipped: false },
-                { label: 'Kapasitas', data: [], backgroundColor: '#1e293b', borderRadius: 3, borderSkipped: false }
+                { label: 'Kapasitas', data: [], backgroundColor: '#1e293b', borderRadius: 3, borderSkipped: false },
+                { label: 'Bed Terisi', data: [], backgroundColor: '#0ea5e9', borderRadius: 3, borderSkipped: false }
             ]}, options: commonBarOptions
         });
 
         const dokterMataChart = new Chart(document.getElementById('dokterMataChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Realisasi', data: [], backgroundColor: '#06b6d4', borderRadius: 3, borderSkipped: false },
-                { label: 'Target', data: [], backgroundColor: '#164e63', borderRadius: 3, borderSkipped: false }
+                { label: 'Target', data: [], backgroundColor: '#164e63', borderRadius: 3, borderSkipped: false },
+                { label: 'Realisasi', data: [], backgroundColor: '#06b6d4', borderRadius: 3, borderSkipped: false }
             ]}, options: commonHorizontalOptions
         });
 
@@ -496,8 +487,8 @@
         const pendapatanChart = new Chart(ctxPendapatan, {
             type: 'line',
             data: { labels: [], datasets: [
-                { label: 'Realisasi (Rp)', data: [], borderColor: '#10b981', backgroundColor: pendapatanGradient, fill: true, tension: 0.4, borderWidth: 2, pointBackgroundColor: '#0b132b', pointBorderColor: '#10b981', pointBorderWidth: 1.5, pointRadius: 2.5, pointHoverRadius: 4 },
-                { label: 'Target (Rp)', data: [], borderColor: '#64748b', borderDash: [3, 3], fill: false, tension: 0.4, borderWidth: 1, pointRadius: 0 }
+                { label: 'Target (Rp)', data: [], borderColor: '#64748b', borderDash: [3, 3], fill: false, tension: 0.4, borderWidth: 1, pointRadius: 0 },
+                { label: 'Realisasi (Rp)', data: [], borderColor: '#10b981', backgroundColor: pendapatanGradient, fill: true, tension: 0.4, borderWidth: 2, pointBackgroundColor: '#0b132b', pointBorderColor: '#10b981', pointBorderWidth: 1.5, pointRadius: 2.5, pointHoverRadius: 4 }
             ]}, 
             options: { 
                 responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, animation: { duration: 600 }, 
@@ -505,6 +496,30 @@
                 scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } } 
             }
         });
+        // Fungsi untuk menggabungkan data yang memiliki nama sama
+// Fungsi untuk menggabungkan data yang memiliki nama sama
+        function aggregateData(arr, nameKey, realKey = 'realisasi', targetKey = 'target') {
+            if (!arr || !Array.isArray(arr)) return [];
+            const result = {};
+            
+            arr.forEach(item => {
+                const name = item[nameKey] || '-';
+                if (!result[name]) {
+                    result[name] = { 
+                        [nameKey]: name, 
+                        [realKey]: 0, 
+                        [targetKey]: 0 
+                    };
+                }
+                // Realisasi tetap dijumlahkan tiap hari
+                result[name][realKey] += Number(item[realKey] || 0);
+                
+                // PENTING: Target / Kapasitas Bed HANYA mengambil angka terbesar (TIDAK dijumlah)
+                result[name][targetKey] = Math.max(result[name][targetKey], Number(item[targetKey] || 0));
+            });
+            
+            return Object.values(result);
+        }
 
         async function updateDashboardFromMySQL() {
             try {
@@ -547,9 +562,20 @@
                         const kat = (item.kategori || '').toLowerCase();
                         const r = Number(item.realisasi || 0);
                         const t = Number(item.target || 0);
-                        if (kat.includes('rajal') || kat.includes('rawat jalan')) { rajalR = r; rajalT = t; }
-                        else if (kat.includes('igd') || kat.includes('darurat')) { igdR = r; igdT = t; }
-                        else if (kat.includes('ranap') || kat.includes('rawat inap')) { ranapR = r; ranapT = t; }
+                        
+                        // Realisasi ditambah (+=), Target ambil nilai terbesar (Math.max)
+                        if (kat.includes('rajal') || kat.includes('rawat jalan')) { 
+                            rajalR += r; 
+                            rajalT = Math.max(rajalT, t); 
+                        }
+                        else if (kat.includes('igd') || kat.includes('darurat')) { 
+                            igdR += r; 
+                            igdT = Math.max(igdT, t); 
+                        }
+                        else if (kat.includes('ranap') || kat.includes('rawat inap')) { 
+                            ranapR += r; 
+                            ranapT = Math.max(ranapT, t); 
+                        }
                     });
                 }
 
@@ -585,12 +611,15 @@
                 
                 document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
 
-                // --- FUNGSI UPDATE CHART LAINNYA ---
+               // --- FUNGSI UPDATE CHART LAINNYA ---
                 const updateChartWithHeader = (chart, dataArray, labelField, realField, targetField, totalTextId, persenBadgeId, isCurrency = false) => {
                     if (!dataArray || !Array.isArray(dataArray)) dataArray = [];
                     chart.data.labels = dataArray.map(i => i[labelField] || '-');
-                    chart.data.datasets[0].data = dataArray.map(i => Number(i[realField] || 0));
-                    chart.data.datasets[1].data = dataArray.map(i => Number(i[targetField] || 0));
+                    
+                    // PERHATIKAN: Data Index [0] diarahkan ke Target, Index [1] ke Realisasi
+                    chart.data.datasets[0].data = dataArray.map(i => Number(i[targetField] || 0));
+                    chart.data.datasets[1].data = dataArray.map(i => Number(i[realField] || 0));
+                    
                     chart.update();
 
                     const totalReal = dataArray.reduce((acc, curr) => acc + Number(curr[realField] || 0), 0);
@@ -607,16 +636,17 @@
                         : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
                 };
 
-                updateChartWithHeader(topPoliChart, data.poli || data.topPoli, 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
-                updateChartWithHeader(kebidananChart, data.kebidanan, 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
-                updateChartWithHeader(kamarOperasiChart, data.kamarOperasi || data.operasi, 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
-                updateChartWithHeader(dokterMataChart, data.mata || data.dokterMata, 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
+                // Membungkus array data dengan fungsi aggregateData()
+updateChartWithHeader(topPoliChart, aggregateData(data.poli || data.topPoli, 'nama_poli'), 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
+updateChartWithHeader(kebidananChart, aggregateData(data.kebidanan, 'nama_dokter'), 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
+updateChartWithHeader(kamarOperasiChart, aggregateData(data.kamarOperasi || data.operasi, 'spesialisasi'), 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
+updateChartWithHeader(dokterMataChart, aggregateData(data.mata || data.dokterMata, 'nama_dokter'), 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
 
-                // BOR Rawat Inap
-                const borArray = data.bor || [];
+// BOR Rawat Inap (Di-aggregate berdasarkan nama_ruangan)
+                const borArray = aggregateData(data.bor || [], 'nama_ruangan', 'bed_terisi', 'kapasitas_bed');
                 borChart.data.labels = borArray.map(i => i.nama_ruangan || '-');
-                borChart.data.datasets[0].data = borArray.map(i => Number(i.bed_terisi || 0));
-                borChart.data.datasets[1].data = borArray.map(i => Number(i.kapasitas_bed || 0));
+                borChart.data.datasets[0].data = borArray.map(i => Number(i.kapasitas_bed || 0)); // Index [0] ke Kapasitas
+                borChart.data.datasets[1].data = borArray.map(i => Number(i.bed_terisi || 0));    // Index [1] ke Terisi
                 borChart.update();
 
                 const totalBed = borArray.reduce((a, b) => a + Number(b.bed_terisi || 0), 0);
@@ -631,12 +661,16 @@
                     let t = i.tanggal || i.hari || '';
                     return t ? t.split('T')[0] : '-';
                 });
-                pendapatanChart.data.datasets[0].data = trenArray.map(i => Number(i.realisasi || 0));
-                pendapatanChart.data.datasets[1].data = trenArray.map(i => Number(i.target || 0));
+                pendapatanChart.data.datasets[0].data = trenArray.map(i => Number(i.target || 0));    // Index [0] ke Target
+                pendapatanChart.data.datasets[1].data = trenArray.map(i => Number(i.realisasi || 0)); // Index [1] ke Realisasi
                 pendapatanChart.update();
 
                 const totalTrenReal = trenArray.reduce((a, b) => a + Number(b.realisasi || 0), 0);
-                const totalTrenTarget = trenArray.reduce((a, b) => a + Number(b.target || 0), 0) > 0 ? trenArray.reduce((a, b) => a + Number(b.target || 0), 0) : targetFin;
+                
+                // PENTING: Ambil angka target terbesar di bulan tersebut (tidak dijumlah)
+                const maxTargetTren = trenArray.reduce((max, curr) => Math.max(max, Number(curr.target || 0)), 0);
+                const totalTrenTarget = maxTargetTren > 0 ? maxTargetTren : targetFin;
+                
                 const trenPersen = totalTrenTarget > 0 ? ((totalTrenReal / totalTrenTarget) * 100).toFixed(1) : 0;
                 document.getElementById('trenTotalText').innerText = `Realisasi: ${formatMiliar(totalTrenReal)} / Target: ${formatMiliar(totalTrenTarget)}`;
                 const trenBadge = document.getElementById('trenPersenBadge');
