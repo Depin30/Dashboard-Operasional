@@ -521,120 +521,19 @@
             return Object.values(result);
         }
 
-        async function updateDashboardFromMySQL() {
+       async function updateDashboardFromMySQL() {
             try {
                 const response = await fetch('/api/dashboard');
                 const data = await response.json();
                 if (!data) return;
 
-               // 1. Finansial / Pendapatan Harian (Kalkulasi dari Tren Harian)
-                const trenArray = data.pendapatan || data.trenPendapatan || [];
-                
-                let targetFin = 0;
-                let realisasiFin = 0;
-                
-                // Realisasi dijumlahkan (+=), Target ambil nilai tertinggi (Math.max)
-                trenArray.forEach(item => {
-                    realisasiFin += Number(item.realisasi || 0);
-                    targetFin = Math.max(targetFin, Number(item.target || 0));
-                });
-
-                // Fallback jika array kosong (menggunakan data finansial global)
-                if (targetFin === 0 && realisasiFin === 0 && data.finansial) {
-                    targetFin = Number(data.finansial.target_pendapatan || data.finansial.target || 0);
-                    realisasiFin = Number(data.finansial.realisasi_pendapatan || data.finansial.realisasi || 0);
-                }
-
-                const gapFin = realisasiFin - targetFin;
-                const persenFin = targetFin > 0 ? ((realisasiFin / targetFin) * 100).toFixed(1) : 0;
-
-                // Update Kartu Pendapatan Atas
-                document.getElementById('targetFinansialText').innerText = formatMiliar(targetFin);
-                document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
-                
-                const realisasiBadge = document.getElementById('persenRealisasiText');
-                if (gapFin >= 0) {
-                    realisasiBadge.innerHTML = `▲ ${persenFin}%`;
-                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                } else {
-                    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
-                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
-                }
-                document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
-
-                // 2. Ringkasan Kunjungan Pasien (Rajal, IGD, Ranap)
-                let rajalR = 0, rajalT = 0, igdR = 0, igdT = 0, ranapR = 0, ranapT = 0;
-                if (data.pasien && !Array.isArray(data.pasien)) {
-                    rajalR = Number(data.pasien.rajal_realisasi || 0);
-                    rajalT = Number(data.pasien.rajal_target || 0);
-                    igdR = Number(data.pasien.igd_realisasi || 0);
-                    igdT = Number(data.pasien.igd_target || 0);
-                    ranapR = Number(data.pasien.ranap_realisasi || 0);
-                    ranapT = Number(data.pasien.ranap_target || 0);
-                } else {
-                    const ringkasanArr = data.ringkasan || data.pasien || [];
-                    ringkasanArr.forEach(item => {
-                        const kat = (item.kategori || '').toLowerCase();
-                        const r = Number(item.realisasi || 0);
-                        const t = Number(item.target || 0);
-                        
-                        // Realisasi ditambah (+=), Target ambil nilai terbesar (Math.max)
-                        if (kat.includes('rajal') || kat.includes('rawat jalan')) { 
-                            rajalR += r; 
-                            rajalT = Math.max(rajalT, t); 
-                        }
-                        else if (kat.includes('igd') || kat.includes('darurat')) { 
-                            igdR += r; 
-                            igdT = Math.max(igdT, t); 
-                        }
-                        else if (kat.includes('ranap') || kat.includes('rawat inap')) { 
-                            ranapR += r; 
-                            ranapT = Math.max(ranapT, t); 
-                        }
-                    });
-                }
-
-                const setPatientCard = (idTotal, idBadge, realisasi, target) => {
-                    document.getElementById(idTotal).innerText = `${realisasi.toLocaleString('id-ID')} / ${target.toLocaleString('id-ID')}`;
-                    const persen = target > 0 ? ((realisasi / target) * 100).toFixed(1) : 0;
-                    const badge = document.getElementById(idBadge);
-                    badge.innerText = `${persen}%`;
-                    badge.className = persen >= 100 
-                        ? 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                        : 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
-                };
-
-                setPatientCard('rajalTotalText', 'rajalPersenBadge', rajalR, rajalT);
-                setPatientCard('igdTotalText', 'igdPersenBadge', igdR, igdT);
-                setPatientCard('ranapTotalText', 'ranapPersenBadge', ranapR, ranapT);
-
-                // --- UPDATE DATA SPEEDOMETER IGD ---
-                igdGaugeChart.data.datasets[0].needleValue = igdR;
-                igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
-                igdGaugeChart.update();
-
-                const igdPersenVal = igdT > 0 ? ((igdR / igdT) * 100).toFixed(1) : 0;
-                const headerPersen = document.getElementById('igdHeaderPersen');
-                headerPersen.innerText = `${igdPersenVal}%`;
-                
-                // Ubah warna badge header IGD berdasarkan capaiannya
-                if (igdPersenVal >= 100) {
-                    headerPersen.className = "text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
-                } else {
-                    headerPersen.className = "text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                }
-                
-                document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
-
-               // --- FUNGSI UPDATE CHART LAINNYA ---
+                // --- HELPER FUNCTION UNTUK CHART ---
                 const updateChartWithHeader = (chart, dataArray, labelField, realField, targetField, totalTextId, persenBadgeId, isCurrency = false) => {
                     if (!dataArray || !Array.isArray(dataArray)) dataArray = [];
                     chart.data.labels = dataArray.map(i => i[labelField] || '-');
                     
-                    // PERHATIKAN: Data Index [0] diarahkan ke Target, Index [1] ke Realisasi
                     chart.data.datasets[0].data = dataArray.map(i => Number(i[targetField] || 0));
                     chart.data.datasets[1].data = dataArray.map(i => Number(i[realField] || 0));
-                    
                     chart.update();
 
                     const totalReal = dataArray.reduce((acc, curr) => acc + Number(curr[realField] || 0), 0);
@@ -651,26 +550,111 @@
                         : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
                 };
 
-                // Membungkus array data dengan fungsi aggregateData()
-updateChartWithHeader(topPoliChart, aggregateData(data.poli || data.topPoli, 'nama_poli'), 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
-updateChartWithHeader(kebidananChart, aggregateData(data.kebidanan, 'nama_dokter'), 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
-updateChartWithHeader(kamarOperasiChart, aggregateData(data.kamarOperasi || data.operasi, 'spesialisasi'), 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
-updateChartWithHeader(dokterMataChart, aggregateData(data.mata || data.dokterMata, 'nama_dokter'), 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
+                // 1. Finansial / Pendapatan Harian
+                const trenArray = data.pendapatan || data.trenPendapatan || [];
+                let targetFin = 0;
+                let realisasiFin = 0;
+                
+                trenArray.forEach(item => {
+                    realisasiFin += Number(item.realisasi || 0);
+                    targetFin = Math.max(targetFin, Number(item.target || 0));
+                });
 
-// BOR Rawat Inap (Di-aggregate berdasarkan nama_ruangan)
-                const borArray = aggregateData(data.bor || [], 'nama_ruangan', 'bed_terisi', 'kapasitas_bed');
-                borChart.data.labels = borArray.map(i => i.nama_ruangan || '-');
-                borChart.data.datasets[0].data = borArray.map(i => Number(i.kapasitas_bed || 0)); // Index [0] ke Kapasitas
-                borChart.data.datasets[1].data = borArray.map(i => Number(i.bed_terisi || 0));    // Index [1] ke Terisi
+                if (targetFin === 0 && realisasiFin === 0 && data.finansial) {
+                    targetFin = Number(data.finansial.target_pendapatan || data.finansial.target || 0);
+                    realisasiFin = Number(data.finansial.realisasi_pendapatan || data.finansial.realisasi || 0);
+                }
+
+                const gapFin = realisasiFin - targetFin;
+                const persenFin = targetFin > 0 ? ((realisasiFin / targetFin) * 100).toFixed(1) : 0;
+
+                document.getElementById('targetFinansialText').innerText = formatMiliar(targetFin);
+                document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
+                
+                const realisasiBadge = document.getElementById('persenRealisasiText');
+                if (gapFin >= 0) {
+                    realisasiBadge.innerHTML = `▲ ${persenFin}%`;
+                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                } else {
+                    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
+                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                }
+                document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
+
+                // 2. Olah Data Poli & BOR untuk Kartu Ringkasan
+                const poliData = aggregateData(data.poli || data.topPoli || [], 'nama_poli');
+                const borData = aggregateData(data.bor || [], 'nama_ruangan', 'bed_terisi', 'kapasitas_bed');
+
+                // Rawat Jalan dari Grafik Poliklinik
+                const rajalR = poliData.reduce((acc, item) => acc + Number(item.realisasi || 0), 0);
+                const rajalT = poliData.reduce((acc, item) => acc + Number(item.target || 0), 0);
+
+                // Rawat Inap dari Grafik BOR Ruangan
+                const ranapR = borData.reduce((acc, item) => acc + Number(item.bed_terisi || 0), 0);
+                const ranapT = borData.reduce((acc, item) => acc + Number(item.kapasitas_bed || 0), 0);
+
+                // IGD diambil dari data ringkasan pasien
+                let igdR = 0, igdT = 0;
+                if (data.pasien && !Array.isArray(data.pasien)) {
+                    igdR = Number(data.pasien.igd_realisasi || 0);
+                    igdT = Number(data.pasien.igd_target || 0);
+                } else {
+                    const ringkasanArr = data.ringkasan || data.pasien || [];
+                    ringkasanArr.forEach(item => {
+                        const kat = (item.kategori || '').toLowerCase();
+                        if (kat.includes('igd') || kat.includes('darurat')) { 
+                            igdR += Number(item.realisasi || 0); 
+                            igdT = Math.max(igdT, Number(item.target || 0)); 
+                        }
+                    });
+                }
+
+                // Update UI Kartu Pasien
+                const setPatientCard = (idTotal, idBadge, realisasi, target) => {
+                    document.getElementById(idTotal).innerText = `${realisasi.toLocaleString('id-ID')} / ${target.toLocaleString('id-ID')}`;
+                    const persen = target > 0 ? ((realisasi / target) * 100).toFixed(1) : 0;
+                    const badge = document.getElementById(idBadge);
+                    badge.innerText = `${persen}%`;
+                    badge.className = persen >= 100 
+                        ? 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                        : 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                };
+
+                setPatientCard('rajalTotalText', 'rajalPersenBadge', rajalR, rajalT);
+                setPatientCard('igdTotalText', 'igdPersenBadge', igdR, igdT);
+                setPatientCard('ranapTotalText', 'ranapPersenBadge', ranapR, ranapT);
+
+                // 3. Update Speedometer IGD
+                igdGaugeChart.data.datasets[0].needleValue = igdR;
+                igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
+                igdGaugeChart.update();
+
+                const igdPersenVal = igdT > 0 ? ((igdR / igdT) * 100).toFixed(1) : 0;
+                const headerPersen = document.getElementById('igdHeaderPersen');
+                headerPersen.innerText = `${igdPersenVal}%`;
+                headerPersen.className = igdPersenVal >= 100 
+                    ? "text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30" 
+                    : "text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                
+                document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
+
+                // 4. Update Grafik Poliklinik, Kebidanan, OK, Mata
+                updateChartWithHeader(topPoliChart, poliData, 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
+                updateChartWithHeader(kebidananChart, aggregateData(data.kebidanan, 'nama_dokter'), 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
+                updateChartWithHeader(kamarOperasiChart, aggregateData(data.kamarOperasi || data.operasi, 'spesialisasi'), 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
+                updateChartWithHeader(dokterMataChart, aggregateData(data.mata || data.dokterMata, 'nama_dokter'), 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
+
+                // 5. Update Grafik BOR Rawat Inap
+                borChart.data.labels = borData.map(i => i.nama_ruangan || '-');
+                borChart.data.datasets[0].data = borData.map(i => Number(i.kapasitas_bed || 0));
+                borChart.data.datasets[1].data = borData.map(i => Number(i.bed_terisi || 0));
                 borChart.update();
 
-                const totalBed = borArray.reduce((a, b) => a + Number(b.bed_terisi || 0), 0);
-                const totalKapasitas = borArray.reduce((a, b) => a + Number(b.kapasitas_bed || 0), 0);
-                const borPersen = totalKapasitas > 0 ? ((totalBed / totalKapasitas) * 100).toFixed(1) : 0;
-                document.getElementById('borInfoText').innerText = `Isi: ${totalBed} / Kap: ${totalKapasitas}`;
+                const borPersen = ranapT > 0 ? ((ranapR / ranapT) * 100).toFixed(1) : 0;
+                document.getElementById('borInfoText').innerText = `Isi: ${ranapR} / Kap: ${ranapT}`;
                 document.getElementById('borTotalText').innerText = `${borPersen}%`;
 
-               // Tren Pendapatan (Memanfaatkan kalkulasi targetFin & realisasiFin dari atas)
+                // 6. Update Tren Pendapatan
                 pendapatanChart.data.labels = trenArray.map(i => {
                     let t = i.tanggal || i.hari || '';
                     return t ? t.split('T')[0] : '-';
@@ -679,15 +663,14 @@ updateChartWithHeader(dokterMataChart, aggregateData(data.mata || data.dokterMat
                 pendapatanChart.data.datasets[1].data = trenArray.map(i => Number(i.realisasi || 0)); 
                 pendapatanChart.update();
                 
-                // Update teks dan badge di header grafik bawah
                 document.getElementById('trenTotalText').innerText = `Realisasi: ${formatMiliar(realisasiFin)} / Target: ${formatMiliar(targetFin)}`;
                 const trenBadge = document.getElementById('trenPersenBadge');
                 trenBadge.innerText = `${persenFin}%`;
                 trenBadge.className = persenFin >= 100 
                     ? 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400' 
                     : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
-                    
-                // UPDATE TANGGAL & WAKTU
+
+                // 7. Tanggal & Waktu Update
                 const now = new Date();
                 const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
                 document.getElementById('currentDateIndicator').innerText = now.toLocaleDateString('id-ID', options);
