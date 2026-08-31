@@ -724,12 +724,10 @@ const setPatientCard = (idTotal, idBadge, realisasi, target) => {
                 igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
                 igdGaugeChart.update();
 
-                const igdPersenVal = igdT > 0 ? ((igdR / igdT) * 100).toFixed(1) : 0;
+                // Menyembunyikan teks persentase di grafik jarum IGD
                 const headerPersen = document.getElementById('igdHeaderPersen');
-                headerPersen.innerText = `${igdPersenVal}%`;
-                headerPersen.className = igdPersenVal >= 100 
-                    ? "text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30" 
-                    : "text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                if (headerPersen) headerPersen.style.display = 'none'; 
+                
                 document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
 
                 // 4. Sinkronisasi Data Chart ke Kanvas
@@ -747,6 +745,22 @@ const setPatientCard = (idTotal, idBadge, realisasi, target) => {
                 const borPersen = ranapT > 0 ? ((ranapR / ranapT) * 100).toFixed(1) : 0;
                 document.getElementById('borInfoText').innerText = `Isi: ${ranapR} / Kap: ${ranapT}`;
                 document.getElementById('borTotalText').innerText = `${borPersen}%`;
+                
+                // Logika 3 Warna untuk Persentase BOR Rawat Inap
+                const borBadge = document.getElementById('borTotalText');
+                borBadge.innerText = `${borPersen}%`;
+                
+                if (borPersen < 50) {
+                    // Di bawah 50% = Merah
+                    borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                } else if (borPersen >= 100) {
+                    // 100% ke atas = Hijau
+                    borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                } else {
+                    // 50% sampai 99% = Kuning
+                    borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                }
+                
 
                 // 6. Update Tren Pendapatan
                 pendapatanChart.data.labels = trenArray.map(i => {
