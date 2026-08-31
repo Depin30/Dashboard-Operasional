@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Operasional - RS Cinta Kasih Tzu Chi</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -84,7 +84,7 @@
     <main class="flex-1 h-full overflow-hidden flex flex-col min-h-0 bg-plasma-bg">
         <header class="bg-[#0b132b]/90 backdrop-blur-md px-6 py-2.5 border-b border-slate-800 flex justify-between items-center shrink-0 z-30">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm" title="Sembunyikan/Tampilkan Menu">
+                <button onclick="toggleSidebar()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm">
                     <i class="fa-solid fa-bars text-sm"></i>
                 </button>
                 <div>
@@ -110,10 +110,12 @@
         </header>
 
         <div class="p-2.5 flex-1 grid grid-rows-[auto_minmax(0,1fr)_105px] gap-2 overflow-hidden max-w-[1700px] w-full mx-auto min-h-0">
+            <!-- Summary Cards -->
             <div class="grid grid-cols-1 lg:grid-cols-6 gap-2.5">
+                <!-- Finansial & Target Cards... (Sama seperti sebelumnya) -->
                 <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
                     <div>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Target Pendapatan</span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Target Pendapatan</span>
                         <h3 id="targetFinansialText" class="text-base font-black text-white tracking-tight mt-0.5">Rp 0</h3>
                     </div>
                     <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex justify-center items-center text-xs border border-blue-500/20"><i class="fa-solid fa-bullseye"></i></div>
@@ -121,7 +123,7 @@
 
                 <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
                     <div class="w-full">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Realisasi Pendapatan</span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Realisasi Pendapatan</span>
                         <div class="flex items-baseline gap-2 mt-0.5">
                             <h3 id="realisasiText" class="text-base font-black text-white tracking-tight">Rp 0</h3>
                             <span id="persenRealisasiText" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">0%</span>
@@ -132,7 +134,7 @@
 
                 <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
                     <div>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Gap / Selisih Target</span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Gap / Selisih Target</span>
                         <h3 id="gapText" class="text-base font-black text-white tracking-tight mt-0.5">Rp 0</h3>
                     </div>
                     <div class="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex justify-center items-center text-xs border border-purple-500/20"><i class="fa-solid fa-chart-line"></i></div>
@@ -140,7 +142,7 @@
 
                 <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
                     <div>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Rawat Jalan (R / T)</span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Rawat Jalan (R / T)</span>
                         <div class="flex items-baseline gap-1 mt-0.5">
                             <h3 id="rajalTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
                         </div>
@@ -150,7 +152,7 @@
 
                 <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
                     <div>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">IGD Pasien (R / T)</span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">IGD Pasien (R / T)</span>
                         <div class="flex items-baseline gap-1 mt-0.5">
                             <h3 id="igdTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
                         </div>
@@ -160,7 +162,7 @@
 
                 <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
                     <div>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Rawat Inap (R / T)</span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Rawat Inap (R / T)</span>
                         <div class="flex items-baseline gap-1 mt-0.5">
                             <h3 id="ranapTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
                         </div>
@@ -169,6 +171,7 @@
                 </div>
             </div>
 
+            <!-- Charts Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-2.5 min-h-0">
                 
                 <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
@@ -213,6 +216,7 @@
                     <div class="relative w-full flex-1 min-h-0"><canvas id="kamarOperasiChart"></canvas></div>
                 </div>
 
+                <!-- IGD Gauge -->
                 <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0 relative overflow-hidden border-blue-500/30">
                     <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-48 h-24 bg-blue-500/10 blur-3xl pointer-events-none z-0"></div>
                     
@@ -232,6 +236,7 @@
                         </div>
                     </div>
                 </div>
+                
                 <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
@@ -261,6 +266,7 @@
                 </div>
             </div>
 
+            <!-- Tren Chart -->
             <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
                 <div class="flex justify-between items-center mb-1 shrink-0">
                     <div class="flex items-center gap-2">
@@ -278,6 +284,7 @@
     </main>
 
     <script>
+        
         // AUTH GUARD
         if (!localStorage.getItem('isLoggedIn')) {
             window.location.href = '/login';
@@ -326,7 +333,6 @@
             formatter: (value) => value > 0 ? value.toLocaleString('id-ID') : ''
         };
 
-        // --- PLUGIN JARUM MODERN ---
         const modernGaugeNeedle = {
             id: 'modernGaugeNeedle',
             afterDatasetsDraw(chart) {
@@ -338,7 +344,6 @@
                 const yCenter = meta.data[0].y;
                 const outerRadius = meta.data[0].outerRadius;
                 const innerRadius = meta.data[0].innerRadius;
-                // Posisi ujung jarum berada tepat di tengah-tengah antara lingkaran luar dan dalam
                 const needleLength = innerRadius + (outerRadius - innerRadius) / 2; 
 
                 const needleValue = data.datasets[0].needleValue || 0;
@@ -349,41 +354,35 @@
                 if (percentage < 0) percentage = 0;
                 if (percentage > 1) percentage = 1;
                 
-                // Konversi ke radian (setengah lingkaran: PI sampai 2*PI)
                 const angle = Math.PI + (percentage * Math.PI);
 
                 ctx.save();
                 ctx.translate(xCenter, yCenter);
                 ctx.rotate(angle);
 
-                // Efek Glow pada Jarum
                 ctx.shadowBlur = 8;
                 ctx.shadowColor = '#f8fafc';
 
-                // Gambar Jarum Meruncing yang Modern
                 ctx.beginPath();
                 ctx.moveTo(0, -2);
                 ctx.lineTo(needleLength - 5, -1);
-                ctx.lineTo(needleLength, 0); // Ujung lancip
+                ctx.lineTo(needleLength, 0);
                 ctx.lineTo(needleLength - 5, 1);
                 ctx.lineTo(0, 2);
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
 
-                // Matikan shadow agar poros tidak blur berlebihan
                 ctx.shadowBlur = 0;
 
-                // Poros Jarum (Lingkaran Bolong ala Sci-Fi)
                 ctx.beginPath();
                 ctx.arc(0, 0, 7, 0, Math.PI * 2);
-                ctx.fillStyle = '#0b132b'; // Sama dengan warna background card
+                ctx.fillStyle = '#0b132b'; 
                 ctx.fill();
                 
                 ctx.lineWidth = 2.5;
-                ctx.strokeStyle = '#3b82f6'; // Ring biru di poros
+                ctx.strokeStyle = '#3b82f6'; 
                 ctx.stroke();
 
-                // Titik putih kecil di poros terdalam
                 ctx.beginPath();
                 ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
                 ctx.fillStyle = '#ffffff';
@@ -393,27 +392,110 @@
             }
         };
 
-        const commonBarOptions = { 
-            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        const commonBarOptions = {
+            responsive: true, 
+            maintainAspectRatio: false, 
+            interaction: { mode: 'index', intersect: false },
             animation: { duration: 600 },
-            plugins: { 
-                legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, font: { weight: 600, size: 10 }, color: '#f8fafc' } },
-                datalabels: { ...datalabelsConfig, anchor: 'end', align: 'top', offset: 2 }
+            
+            layout: {
+                padding: {
+                    top: 1,    // <-- Ruang ekstra besar di bagian atas untuk legenda & angka
+                    bottom: 10  
+                }
             },
-            scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } }
+            
+            plugins: { 
+                legend: { 
+                    display: true,       
+                    position: 'top',     
+                    align: 'end',
+                    labels: {
+                        boxWidth: 10,
+                        boxHeight: 10,
+                        font: { family: "'Inter', sans-serif", size: 10, weight: '500' },
+                        color: '#64748b',
+                        padding: 15
+                    }
+                },
+                datalabels: { 
+                    color: '#ffffff', // <-- Warna angka diatur putih
+                    font: { weight: 'bold', size: 10, family: "'Inter', sans-serif" }, 
+                    anchor: 'end', 
+                    align: 'top', 
+                    offset: 3,
+                    formatter: (value) => value > 0 ? value.toLocaleString('id-ID') : ''
+                } 
+            },
+            scales: { 
+                y: { 
+                    grid: { display: false },
+                    beginAtZero: true,
+                    grace: '45%', // <-- Sumbu Y dibuat jauh lebih tinggi agar batang grafik tidak mentok ke atas
+                    ticks: { font: { family: "'Inter', sans-serif", size: 10, weight: '500' }, color: '#94a3b8' }
+                }, 
+                x: { 
+                    grid: { display: false },
+                    ticks: { 
+                        font: { family: "'Inter', sans-serif", size: 8, weight: '500' }, 
+                        color: '#94a3b8',
+                        maxRotation: 0,  
+                        minRotation: 0,
+                        autoSkip: false 
+                    } 
+                } 
+            }
         };
 
-        const commonHorizontalOptions = { 
-            indexAxis: 'y', responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+    const commonHorizontalOptions = { 
+            indexAxis: 'y', 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            interaction: { mode: 'index', intersect: false },
             animation: { duration: 600 },
-            plugins: { 
-                legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, font: { weight: 600, size: 10 }, color: '#f8fafc' } },
-                datalabels: { ...datalabelsConfig, anchor: 'end', align: 'right', offset: 2 } 
+            
+            layout: {
+                padding: {
+                    top: 1,    // <-- Ruang kosong di atas agar legenda tidak menabrak bar teratas
+                    right: 3   // <-- Ruang kosong di kanan agar angka di ujung bar tidak terpotong
+                }
             },
-            scales: { y: { grid: { display: false } }, x: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } }
+            
+            plugins: { 
+                legend: { 
+                    display: true,       // <-- Legenda horizontal diaktifkan kembali
+                    position: 'top',     // Di atas
+                    align: 'end',        // Di pojok kanan atas
+                    labels: { 
+                        usePointStyle: true, 
+                        boxWidth: 6, 
+                        boxHeight: 6, 
+                        font: { weight: 600, size: 10, family: "'Inter', sans-serif" }, 
+                        color: '#f8fafc' 
+                    } 
+                },
+                datalabels: { 
+                    ...datalabelsConfig, 
+                    color: '#ffffff', // <-- Warna angka diatur putih agar jelas terbaca
+                    anchor: 'end', 
+                    align: 'right', 
+                    offset: 4 
+                } 
+            },
+            scales: { 
+                y: { 
+                    grid: { display: false } 
+                }, 
+                x: { 
+                    border: { dash: [4, 4], display: false }, 
+                    beginAtZero: true, 
+                    grace: '35%' // <-- Memperpanjang batas sumbu X agar ada ruang lega untuk angka besar di kanan
+                } 
+            }
         };
+       
 
-      // INISIALISASI CHART.JS (Poli, Kebidanan, OK, BOR, Mata)
+        // INISIALISASI CHART
         const topPoliChart = new Chart(document.getElementById('topPoliChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
@@ -438,7 +520,6 @@
             ]}, options: commonBarOptions
         });
 
-        // INIT CHART IGD MODERN (Doughnut)
         const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('2d'), {
             type: 'doughnut',
             data: {
@@ -496,14 +577,14 @@
                 scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } } 
             }
         });
-        // Fungsi untuk menggabungkan data yang memiliki nama sama
-// Fungsi untuk menggabungkan data yang memiliki nama sama
+
+        // FUNGSI AGREGASI DATA DINAMIS DARI ADMIN
         function aggregateData(arr, nameKey, realKey = 'realisasi', targetKey = 'target') {
             if (!arr || !Array.isArray(arr)) return [];
             const result = {};
             
             arr.forEach(item => {
-                const name = item[nameKey] || '-';
+                const name = item[nameKey] || item['nama'] || item['spesialisasi'] || item['kategori'] || '-';
                 if (!result[name]) {
                     result[name] = { 
                         [nameKey]: name, 
@@ -511,10 +592,8 @@
                         [targetKey]: 0 
                     };
                 }
-                // Realisasi tetap dijumlahkan tiap hari
                 result[name][realKey] += Number(item[realKey] || 0);
-                
-                // PENTING: Target / Kapasitas Bed HANYA mengambil angka terbesar (TIDAK dijumlah)
+                // Sinkronisasi khusus target (sesuai setting form admin)
                 result[name][targetKey] = Math.max(result[name][targetKey], Number(item[targetKey] || 0));
             });
             
@@ -523,15 +602,15 @@
 
        async function updateDashboardFromMySQL() {
             try {
+                // Fetch data dari API Admin
                 const response = await fetch('/api/dashboard');
                 const data = await response.json();
                 if (!data) return;
 
-                // --- HELPER FUNCTION UNTUK CHART ---
+                // HELPER CHART DINAMIS
                 const updateChartWithHeader = (chart, dataArray, labelField, realField, targetField, totalTextId, persenBadgeId, isCurrency = false) => {
                     if (!dataArray || !Array.isArray(dataArray)) dataArray = [];
-                    chart.data.labels = dataArray.map(i => i[labelField] || '-');
-                    
+                    chart.data.labels = dataArray.map(i => i[labelField] || i['nama'] || '-');
                     chart.data.datasets[0].data = dataArray.map(i => Number(i[targetField] || 0));
                     chart.data.datasets[1].data = dataArray.map(i => Number(i[realField] || 0));
                     chart.update();
@@ -550,7 +629,7 @@
                         : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
                 };
 
-                // 1. Finansial / Pendapatan Harian
+                // 1. Sinkronisasi Finansial / Pendapatan
                 const trenArray = data.pendapatan || data.trenPendapatan || [];
                 let targetFin = 0;
                 let realisasiFin = 0;
@@ -571,29 +650,38 @@
                 document.getElementById('targetFinansialText').innerText = formatMiliar(targetFin);
                 document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
                 
-                const realisasiBadge = document.getElementById('persenRealisasiText');
-                if (gapFin >= 0) {
-                    realisasiBadge.innerHTML = `▲ ${persenFin}%`;
-                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                } else {
-                    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
-                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
-                }
-                document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
+               const realisasiBadge = document.getElementById('persenRealisasiText');
+const persenNum = Number(persenFin); // Pastikan dibaca sebagai angka
 
-                // 2. Olah Data Poli & BOR untuk Kartu Ringkasan
+if (persenNum < 50) {
+    // Di bawah 50% = Merah (Rose)
+    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
+    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
+} else if (persenNum >= 100) {
+    // 100% atau lebih = Hijau (Emerald)
+    realisasiBadge.innerHTML = `▲ ${persenFin}%`;
+    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+} else {
+    // 50% sampai 99% = Kuning (Amber)
+    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
+    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30";
+}
+
+document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
+
+                // 2. Sinkronisasi Data Kategori Layanan (Mapping dari input Admin)
                 const poliData = aggregateData(data.poli || data.topPoli || [], 'nama_poli');
                 const borData = aggregateData(data.bor || [], 'nama_ruangan', 'bed_terisi', 'kapasitas_bed');
+                const kebidananData = aggregateData(data.kebidanan || [], 'nama_dokter');
+                const kamarOperasiData = aggregateData(data.kamarOperasi || data.operasi || [], 'spesialisasi');
+                const dokterMataData = aggregateData(data.mata || data.dokterMata || [], 'nama_dokter');
 
-                // Rawat Jalan dari Grafik Poliklinik
                 const rajalR = poliData.reduce((acc, item) => acc + Number(item.realisasi || 0), 0);
                 const rajalT = poliData.reduce((acc, item) => acc + Number(item.target || 0), 0);
 
-                // Rawat Inap dari Grafik BOR Ruangan
                 const ranapR = borData.reduce((acc, item) => acc + Number(item.bed_terisi || 0), 0);
                 const ranapT = borData.reduce((acc, item) => acc + Number(item.kapasitas_bed || 0), 0);
 
-                // IGD diambil dari data ringkasan pasien
                 let igdR = 0, igdT = 0;
                 if (data.pasien && !Array.isArray(data.pasien)) {
                     igdR = Number(data.pasien.igd_realisasi || 0);
@@ -608,23 +696,30 @@
                         }
                     });
                 }
-
-                // Update UI Kartu Pasien
-                const setPatientCard = (idTotal, idBadge, realisasi, target) => {
-                    document.getElementById(idTotal).innerText = `${realisasi.toLocaleString('id-ID')} / ${target.toLocaleString('id-ID')}`;
-                    const persen = target > 0 ? ((realisasi / target) * 100).toFixed(1) : 0;
-                    const badge = document.getElementById(idBadge);
-                    badge.innerText = `${persen}%`;
-                    badge.className = persen >= 100 
-                        ? 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                        : 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
-                };
+const setPatientCard = (idTotal, idBadge, realisasi, target) => {
+    document.getElementById(idTotal).innerText = `${realisasi.toLocaleString('id-ID')} / ${target.toLocaleString('id-ID')}`;
+    const persen = target > 0 ? ((realisasi / target) * 100).toFixed(1) : 0;
+    const badge = document.getElementById(idBadge);
+    badge.innerText = `${persen}%`;
+    
+    // Logika 3 warna berdasarkan persentase
+    if (persen < 50) {
+        // Di bawah 50% = Merah (Rose)
+        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30';
+    } else if (persen >= 100) {
+        // 100% atau lebih = Hijau (Emerald)
+        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+    } else {
+        // 50% sampai 99% = Kuning (Amber)
+        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
+    }
+};
 
                 setPatientCard('rajalTotalText', 'rajalPersenBadge', rajalR, rajalT);
                 setPatientCard('igdTotalText', 'igdPersenBadge', igdR, igdT);
                 setPatientCard('ranapTotalText', 'ranapPersenBadge', ranapR, ranapT);
 
-                // 3. Update Speedometer IGD
+                // 3. Update Gauge IGD
                 igdGaugeChart.data.datasets[0].needleValue = igdR;
                 igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
                 igdGaugeChart.update();
@@ -635,16 +730,15 @@
                 headerPersen.className = igdPersenVal >= 100 
                     ? "text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30" 
                     : "text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                
                 document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
 
-                // 4. Update Grafik Poliklinik, Kebidanan, OK, Mata
+                // 4. Sinkronisasi Data Chart ke Kanvas
                 updateChartWithHeader(topPoliChart, poliData, 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
-                updateChartWithHeader(kebidananChart, aggregateData(data.kebidanan, 'nama_dokter'), 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
-                updateChartWithHeader(kamarOperasiChart, aggregateData(data.kamarOperasi || data.operasi, 'spesialisasi'), 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
-                updateChartWithHeader(dokterMataChart, aggregateData(data.mata || data.dokterMata, 'nama_dokter'), 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
+                updateChartWithHeader(kebidananChart, kebidananData, 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
+                updateChartWithHeader(kamarOperasiChart, kamarOperasiData, 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
+                updateChartWithHeader(dokterMataChart, dokterMataData, 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
 
-                // 5. Update Grafik BOR Rawat Inap
+                // 5. Update Chart BOR
                 borChart.data.labels = borData.map(i => i.nama_ruangan || '-');
                 borChart.data.datasets[0].data = borData.map(i => Number(i.kapasitas_bed || 0));
                 borChart.data.datasets[1].data = borData.map(i => Number(i.bed_terisi || 0));
@@ -670,14 +764,14 @@
                     ? 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400' 
                     : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
 
-                // 7. Tanggal & Waktu Update
+                // 7. Update Tanggal & Waktu Sinkronisasi
                 const now = new Date();
                 const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
                 document.getElementById('currentDateIndicator').innerText = now.toLocaleDateString('id-ID', options);
                 document.getElementById('lastUpdateText').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
 
             } catch (err) {
-                console.error('Gagal memperbarui dashboard:', err);
+                console.error('Gagal mensinkronisasikan data dengan admin (MySQL):', err);
             }
         }
 
@@ -711,6 +805,36 @@
             updateDashboardFromMySQL();
             setTimeout(() => { icon.classList.remove('fa-spin'); }, 600);
         }
+        // 1. MASTER LIST (Sesuai dengan permintaan Anda)
+const MASTER_POLI = ['Mata', 'Kebidanan', 'THT', 'Anak', 'Penyakit Dalam'];
+const MASTER_OPERASI = ['Mata', 'Bedah Umum', 'Kebidanan', 'Ortopedi', 'THT', 'Urologi'];
+const MASTER_BOR = ['Orchid', 'Peony', 'Lotus', 'ICU', 'PICU'];
+const MASTER_KEBIDANAN = ['dr. Andri Hondir', 'dr.Jenifer Uriah', 'dr.Rino Apin'];
+const MASTER_MATA = ['dr.Airina Stefanie', 'dr.Calista Natashya', 'dr.Esti Wardhani', 'dr.Grace', 'dr.Vincent Wang Tahjia', 'dr.Gladys'];
+
+// Fungsi penggabung data master dengan database
+function mergeWithMaster(dbData, masterList, nameKey, realKey = 'realisasi', targetKey = 'target') {
+    if (!dbData) dbData = [];
+    return masterList.map(name => {
+        // Cari apakah nama ini sudah di-entry di database
+        const found = dbData.find(item => {
+            const dbName = item[nameKey] || item['nama'] || item['spesialisasi'] || '';
+            return dbName.trim().toLowerCase() === name.trim().toLowerCase();
+        });
+
+        if (found) {
+            return found; // Gunakan data asli dari database jika sudah ada
+        } else {
+            // Jika BELUM di-entry, buat data dengan nilai 0 agar tetap tampil di grafik
+            return {
+                [nameKey]: name,
+                [realKey]: 0,
+                [targetKey]: 0
+            };
+        }
+    });
+}
+
 
         updateDashboardFromMySQL();
     </script>
