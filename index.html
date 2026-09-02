@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Operasional - RS Cinta Kasih Tzu Chi</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -96,6 +96,11 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
+                <!-- TOMBOL FULL SCREEN -->
+                <button onclick="toggleFullScreen()" title="Layar Penuh" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-expand" id="fullScreenIcon"></i> <span id="fullScreenText">Full Screen</span>
+                </button>
+                
                 <button onclick="manualRefresh()" title="Ambil data terbaru sekarang" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> Refresh
                 </button>
@@ -112,7 +117,6 @@
         <div class="p-2.5 flex-1 grid grid-rows-[auto_minmax(0,1fr)_105px] gap-2 overflow-hidden max-w-[1700px] w-full mx-auto min-h-0">
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 lg:grid-cols-6 gap-2.5">
-                <!-- Finansial & Target Cards... (Sama seperti sebelumnya) -->
                 <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
                     <div>
                         <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Target Pendapatan</span>
@@ -302,6 +306,39 @@
             sidebar.classList.toggle('w-0');
         }
 
+        // FUNGSI TOGGLE FULL SCREEN
+        function toggleFullScreen() {
+            const icon = document.getElementById('fullScreenIcon');
+            const text = document.getElementById('fullScreenText');
+            
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Gagal masuk ke mode Fullscreen: ${err.message}`);
+                });
+                if (icon) icon.className = 'fa-solid fa-compress';
+                if (text) text.innerText = 'Exit Fullscreen';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+                if (icon) icon.className = 'fa-solid fa-expand';
+                if (text) text.innerText = 'Full Screen';
+            }
+        }
+
+        // Listener untuk mengubah ikon ketika pengguna menekan tombol ESC keyboard
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fullScreenIcon');
+            const text = document.getElementById('fullScreenText');
+            if (!document.fullscreenElement) {
+                if (icon) icon.className = 'fa-solid fa-expand';
+                if (text) text.innerText = 'Full Screen';
+            } else {
+                if (icon) icon.className = 'fa-solid fa-compress';
+                if (text) text.innerText = 'Exit Fullscreen';
+            }
+        });
+
         // DEFAULTS CHART.JS
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#94a3b8';
@@ -400,7 +437,7 @@
             
             layout: {
                 padding: {
-                    top: 1,    // <-- Ruang ekstra besar di bagian atas untuk legenda & angka
+                    top: 1,
                     bottom: 10  
                 }
             },
@@ -419,7 +456,7 @@
                     }
                 },
                 datalabels: { 
-                    color: '#ffffff', // <-- Warna angka diatur putih
+                    color: '#ffffff',
                     font: { weight: 'bold', size: 10, family: "'Inter', sans-serif" }, 
                     anchor: 'end', 
                     align: 'top', 
@@ -431,7 +468,7 @@
                 y: { 
                     grid: { display: false },
                     beginAtZero: true,
-                    grace: '45%', // <-- Sumbu Y dibuat jauh lebih tinggi agar batang grafik tidak mentok ke atas
+                    grace: '45%',
                     ticks: { font: { family: "'Inter', sans-serif", size: 10, weight: '500' }, color: '#94a3b8' }
                 }, 
                 x: { 
@@ -456,16 +493,16 @@
             
             layout: {
                 padding: {
-                    top: 1,    // <-- Ruang kosong di atas agar legenda tidak menabrak bar teratas
-                    right: 3   // <-- Ruang kosong di kanan agar angka di ujung bar tidak terpotong
+                    top: 1,
+                    right: 3
                 }
             },
             
             plugins: { 
                 legend: { 
-                    display: true,       // <-- Legenda horizontal diaktifkan kembali
-                    position: 'top',     // Di atas
-                    align: 'end',        // Di pojok kanan atas
+                    display: true,
+                    position: 'top',
+                    align: 'end',
                     labels: { 
                         usePointStyle: true, 
                         boxWidth: 6, 
@@ -476,7 +513,7 @@
                 },
                 datalabels: { 
                     ...datalabelsConfig, 
-                    color: '#ffffff', // <-- Warna angka diatur putih agar jelas terbaca
+                    color: '#ffffff',
                     anchor: 'end', 
                     align: 'right', 
                     offset: 4 
@@ -489,7 +526,7 @@
                 x: { 
                     border: { dash: [4, 4], display: false }, 
                     beginAtZero: true, 
-                    grace: '35%' // <-- Memperpanjang batas sumbu X agar ada ruang lega untuk angka besar di kanan
+                    grace: '35%'
                 } 
             }
         };
@@ -593,7 +630,6 @@
                     };
                 }
                 result[name][realKey] += Number(item[realKey] || 0);
-                // Sinkronisasi khusus target (sesuai setting form admin)
                 result[name][targetKey] = Math.max(result[name][targetKey], Number(item[targetKey] || 0));
             });
             
@@ -650,70 +686,71 @@
                 document.getElementById('targetFinansialText').innerText = formatMiliar(targetFin);
                 document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
                 
-               const realisasiBadge = document.getElementById('persenRealisasiText');
-const persenNum = Number(persenFin); // Pastikan dibaca sebagai angka
+                const realisasiBadge = document.getElementById('persenRealisasiText');
+                const persenNum = Number(persenFin);
 
-if (persenNum < 50) {
-    // Di bawah 50% = Merah (Rose)
-    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
-    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
-} else if (persenNum >= 100) {
-    // 100% atau lebih = Hijau (Emerald)
-    realisasiBadge.innerHTML = `▲ ${persenFin}%`;
-    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-} else {
-    // 50% sampai 99% = Kuning (Amber)
-    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
-    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30";
-}
+                if (persenNum < 50) {
+                    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
+                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                } else if (persenNum >= 100) {
+                    realisasiBadge.innerHTML = `▲ ${persenFin}%`;
+                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                } else {
+                    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
+                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30";
+                }
 
-document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
+                document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
 
-                // 2. Sinkronisasi Data Kategori Layanan (Mapping dari input Admin)
+                // 2. Sinkronisasi Data Kategori Layanan
                 const poliData = aggregateData(data.poli || data.topPoli || [], 'nama_poli');
                 const borData = aggregateData(data.bor || [], 'nama_ruangan', 'bed_terisi', 'kapasitas_bed');
                 const kebidananData = aggregateData(data.kebidanan || [], 'nama_dokter');
                 const kamarOperasiData = aggregateData(data.kamarOperasi || data.operasi || [], 'spesialisasi');
                 const dokterMataData = aggregateData(data.mata || data.dokterMata || [], 'nama_dokter');
+let rajalR = 0, rajalT = 0;
+let ranapR = 0, ranapT = 0;
+let igdR = 0, igdT = 0;
 
-                const rajalR = poliData.reduce((acc, item) => acc + Number(item.realisasi || 0), 0);
-                const rajalT = poliData.reduce((acc, item) => acc + Number(item.target || 0), 0);
+const ringkasanArr = data.ringkasan || data.pasien || [];
+if (Array.isArray(ringkasanArr)) {
+    ringkasanArr.forEach(item => {
+        const kat = (item.kategori || '').toLowerCase();
+        const real = Number(item.realisasi || 0);
+        const target = Number(item.target || 0);
 
-                const ranapR = borData.reduce((acc, item) => acc + Number(item.bed_terisi || 0), 0);
-                const ranapT = borData.reduce((acc, item) => acc + Number(item.kapasitas_bed || 0), 0);
+        if (kat.includes('igd') || kat.includes('darurat')) {
+            igdR += real;
+            igdT = Math.max(igdT, target);
+        } else if (kat.includes('rawat jalan') || kat.includes('rajal')) {
+            rajalR += real;
+            rajalT = Math.max(rajalT, target);
+        } else if (kat.includes('rawat inap') || kat.includes('ranap')) {
+            ranapR += real;
+            ranapT = Math.max(ranapT, target);
+        }
+    });
+}
 
-                let igdR = 0, igdT = 0;
-                if (data.pasien && !Array.isArray(data.pasien)) {
-                    igdR = Number(data.pasien.igd_realisasi || 0);
-                    igdT = Number(data.pasien.igd_target || 0);
-                } else {
-                    const ringkasanArr = data.ringkasan || data.pasien || [];
-                    ringkasanArr.forEach(item => {
-                        const kat = (item.kategori || '').toLowerCase();
-                        if (kat.includes('igd') || kat.includes('darurat')) { 
-                            igdR += Number(item.realisasi || 0); 
-                            igdT = Math.max(igdT, Number(item.target || 0)); 
-                        }
-                    });
-                }
-const setPatientCard = (idTotal, idBadge, realisasi, target) => {
-    document.getElementById(idTotal).innerText = `${realisasi.toLocaleString('id-ID')} / ${target.toLocaleString('id-ID')}`;
-    const persen = target > 0 ? ((realisasi / target) * 100).toFixed(1) : 0;
-    const badge = document.getElementById(idBadge);
-    badge.innerText = `${persen}%`;
-    
-    // Logika 3 warna berdasarkan persentase
-    if (persen < 50) {
-        // Di bawah 50% = Merah (Rose)
-        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30';
-    } else if (persen >= 100) {
-        // 100% atau lebih = Hijau (Emerald)
-        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-    } else {
-        // 50% sampai 99% = Kuning (Amber)
-        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
-    }
-};
+if (igdR === 0 && igdT === 0 && data.pasien && !Array.isArray(data.pasien)) {
+    igdR = Number(data.pasien.igd_realisasi || 0);
+    igdT = Number(data.pasien.igd_target || 0);
+}
+
+                const setPatientCard = (idTotal, idBadge, realisasi, target) => {
+                    document.getElementById(idTotal).innerText = `${realisasi.toLocaleString('id-ID')} / ${target.toLocaleString('id-ID')}`;
+                    const persen = target > 0 ? ((realisasi / target) * 100).toFixed(1) : 0;
+                    const badge = document.getElementById(idBadge);
+                    badge.innerText = `${persen}%`;
+                    
+                    if (persen < 50) {
+                        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                    } else if (persen >= 100) {
+                        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                    } else {
+                        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                    }
+                };
 
                 setPatientCard('rajalTotalText', 'rajalPersenBadge', rajalR, rajalT);
                 setPatientCard('igdTotalText', 'igdPersenBadge', igdR, igdT);
@@ -724,10 +761,9 @@ const setPatientCard = (idTotal, idBadge, realisasi, target) => {
                 igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
                 igdGaugeChart.update();
 
-                // Menyembunyikan teks persentase di grafik jarum IGD
                 const headerPersen = document.getElementById('igdHeaderPersen');
                 if (headerPersen) headerPersen.style.display = 'none'; 
-                
+                 
                 document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
 
                 // 4. Sinkronisasi Data Chart ke Kanvas
@@ -744,23 +780,17 @@ const setPatientCard = (idTotal, idBadge, realisasi, target) => {
 
                 const borPersen = ranapT > 0 ? ((ranapR / ranapT) * 100).toFixed(1) : 0;
                 document.getElementById('borInfoText').innerText = `Isi: ${ranapR} / Kap: ${ranapT}`;
-                document.getElementById('borTotalText').innerText = `${borPersen}%`;
                 
-                // Logika 3 Warna untuk Persentase BOR Rawat Inap
                 const borBadge = document.getElementById('borTotalText');
                 borBadge.innerText = `${borPersen}%`;
                 
                 if (borPersen < 50) {
-                    // Di bawah 50% = Merah
                     borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30';
                 } else if (borPersen >= 100) {
-                    // 100% ke atas = Hijau
                     borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
                 } else {
-                    // 50% sampai 99% = Kuning
                     borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
                 }
-                
 
                 // 6. Update Tren Pendapatan
                 pendapatanChart.data.labels = trenArray.map(i => {
@@ -819,36 +849,33 @@ const setPatientCard = (idTotal, idBadge, realisasi, target) => {
             updateDashboardFromMySQL();
             setTimeout(() => { icon.classList.remove('fa-spin'); }, 600);
         }
-        // 1. MASTER LIST (Sesuai dengan permintaan Anda)
-const MASTER_POLI = ['Mata', 'Kebidanan', 'THT', 'Anak', 'Penyakit Dalam'];
-const MASTER_OPERASI = ['Mata', 'Bedah Umum', 'Kebidanan', 'Ortopedi', 'THT', 'Urologi'];
-const MASTER_BOR = ['Orchid', 'Peony', 'Lotus', 'ICU', 'PICU'];
-const MASTER_KEBIDANAN = ['dr. Andri Hondir', 'dr.Jenifer Uriah', 'dr.Rino Apin'];
-const MASTER_MATA = ['dr.Airina Stefanie', 'dr.Calista Natashya', 'dr.Esti Wardhani', 'dr.Grace', 'dr.Vincent Wang Tahjia', 'dr.Gladys'];
 
-// Fungsi penggabung data master dengan database
-function mergeWithMaster(dbData, masterList, nameKey, realKey = 'realisasi', targetKey = 'target') {
-    if (!dbData) dbData = [];
-    return masterList.map(name => {
-        // Cari apakah nama ini sudah di-entry di database
-        const found = dbData.find(item => {
-            const dbName = item[nameKey] || item['nama'] || item['spesialisasi'] || '';
-            return dbName.trim().toLowerCase() === name.trim().toLowerCase();
-        });
+        // MASTER LIST
+        const MASTER_POLI = ['Mata', 'Kebidanan', 'THT', 'Anak', 'Penyakit Dalam'];
+        const MASTER_OPERASI = ['Mata', 'Bedah Umum', 'Kebidanan', 'Ortopedi', 'THT', 'Urologi'];
+        const MASTER_BOR = ['Orchid', 'Peony', 'Lotus', 'ICU', 'PICU'];
+        const MASTER_KEBIDANAN = ['dr. Andri Hondir', 'dr.Jenifer Uriah', 'dr.Rino Apin'];
+        const MASTER_MATA = ['dr.Airina Stefanie', 'dr.Calista Natashya', 'dr.Esti Wardhani', 'dr.Grace', 'dr.Vincent Wang Tahjia', 'dr.Gladys', 'dr.Richardo Rusli'];
 
-        if (found) {
-            return found; // Gunakan data asli dari database jika sudah ada
-        } else {
-            // Jika BELUM di-entry, buat data dengan nilai 0 agar tetap tampil di grafik
-            return {
-                [nameKey]: name,
-                [realKey]: 0,
-                [targetKey]: 0
-            };
+        function mergeWithMaster(dbData, masterList, nameKey, realKey = 'realisasi', targetKey = 'target') {
+            if (!dbData) dbData = [];
+            return masterList.map(name => {
+                const found = dbData.find(item => {
+                    const dbName = item[nameKey] || item['nama'] || item['spesialisasi'] || '';
+                    return dbName.trim().toLowerCase() === name.trim().toLowerCase();
+                });
+
+                if (found) {
+                    return found;
+                } else {
+                    return {
+                        [nameKey]: name,
+                        [realKey]: 0,
+                        [targetKey]: 0
+                    };
+                }
+            });
         }
-    });
-}
-
 
         updateDashboardFromMySQL();
     </script>

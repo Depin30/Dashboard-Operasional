@@ -579,7 +579,7 @@
                     <!-- NAVBAR ENTRY BARU -->  
                     <div class="flex overflow-x-auto gap-2 pb-2 border-b border-slate-800 hide-scroll">
                         <button type="button" onclick="switchEntryTab('pendapatan')" id="btnEntryNav_pendapatan" class="entry-tab-btn bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shadow-md shadow-blue-900/20">Finansial</button>
-                        <button type="button" onclick="switchEntryTab('ringkasan')" id="btnEntryNav_ringkasan" class="entry-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">Ringkasan (IGD)</button>
+                       <button type="button" onclick="switchEntryTab('ringkasan')" id="btnEntryNav_ringkasan" class="entry-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">Ringkasan Pasien</button>
                         <button type="button" onclick="switchEntryTab('poli')" id="btnEntryNav_poli" class="entry-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">Poliklinik</button>
                         <button type="button" onclick="switchEntryTab('operasi')" id="btnEntryNav_operasi" class="entry-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">Kamar Operasi</button>
                         <button type="button" onclick="switchEntryTab('bor')" id="btnEntryNav_bor" class="entry-tab-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">BOR Ruangan</button>
@@ -607,26 +607,41 @@
                         </div>
                     </div>
 
-                    <!-- BUNGKUSAN RINGKASAN PASIEN -->
-                    <div id="entry_ringkasan" class="entry-content hidden">
-                        <div class="card-plasma p-6 rounded-2xl">
-                            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-xs border border-blue-500/20"><i class="fa-solid fa-users"></i></div>
-                                    <h3 class="font-bold text-white text-sm uppercase tracking-wider">Ringkasan Pasien (IGD)</h3>
-                                </div>
-                                <span id="editModeIndicatorRingkasan" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
-                            </div>
-                            
-                            <div id="ringkasanContainer" class="space-y-3">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
-                                    <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200" value="IGD" readonly>
-                                    <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target Pasien IGD">
-                                    <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi Pasien IGD">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                   <!-- BUNGKUSAN RINGKASAN PASIEN -->
+<div id="entry_ringkasan" class="entry-content hidden">
+    <div class="card-plasma p-6 rounded-2xl">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-xs border border-blue-500/20"><i class="fa-solid fa-users"></i></div>
+                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Ringkasan Kunjungan Pasien</h3>
+            </div>
+            <span id="editModeIndicatorRingkasan" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
+        </div>
+        
+        <div id="ringkasanContainer" class="space-y-3">
+            <!-- Form IGD -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200 border-0" value="IGD" readonly>
+                <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target Pasien IGD">
+                <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi Pasien IGD">
+            </div>
+
+            <!-- Form Rawat Jalan -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200 border-0" value="Rawat Jalan" readonly>
+                <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target Rawat Jalan">
+                <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi Rawat Jalan">
+            </div>
+
+            <!-- Form Rawat Inap -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pasien-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="pasien-kategori rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-200 border-0" value="Rawat Inap" readonly>
+                <input type="number" class="pasien-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target Rawat Inap">
+                <input type="number" class="pasien-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi Rawat Inap">
+            </div>
+        </div>
+    </div>
+</div>
 
                     <div id="entry_poli" class="entry-content hidden">
                         <div class="card-plasma p-6 rounded-2xl">
@@ -782,51 +797,62 @@
                         </div>
                     </div>
 
-                    <!-- BUNGKUSAN TOP OK MATA -->
-                    <div id="entry_mata" class="entry-content hidden">
-                        <div class="card-plasma p-6 rounded-2xl">
-                            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xs border border-cyan-500/20"><i class="fa-solid fa-eye"></i></div>
-                                    <h3 class="font-bold text-white text-sm uppercase tracking-wider">Top OK Mata</h3>
-                                </div>
-                                <span id="editModeIndicatorMata" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
-                            </div>
-                            <div id="mataContainer" class="space-y-3">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
-                                    <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Airina Stefanie" readonly>
-                                    <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
-                                    <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
-                                    <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Calista Natashya" readonly>
-                                    <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
-                                    <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
-                                    <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Esti Wardhani" readonly>
-                                    <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
-                                    <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
-                                    <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Grace" readonly>
-                                    <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
-                                    <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
-                                    <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Vincent Wang Tahjia" readonly>
-                                    <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
-                                    <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
-                                    <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Gladys" readonly>
-                                    <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
-                                    <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                 <!-- BUNGKUSAN TOP OK MATA -->
+<div id="entry_mata" class="entry-content hidden">
+    <div class="card-plasma p-6 rounded-2xl">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xs border border-cyan-500/20"><i class="fa-solid fa-eye"></i></div>
+                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Top OK Mata</h3>
+            </div>
+            <span id="editModeIndicatorMata" class="text-xs font-semibold text-amber-400 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Mode Edit Item</span>
+        </div>
+        
+        <div id="mataContainer" class="space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Airina Stefanie" readonly>
+                <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
+                <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Calista Natashya" readonly>
+                <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
+                <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Esti Wardhani" readonly>
+                <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
+                <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Grace" readonly>
+                <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
+                <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Vincent Wang Tahjia" readonly>
+                <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
+                <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Gladys" readonly>
+                <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
+                <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mata-row bg-[#050814] p-3 rounded-xl border border-slate-800 items-center">
+                <input type="text" class="mata-nama rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-300 border-0" value="dr. Richardo Rusli" readonly>
+                <input type="number" class="mata-target rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Target">
+                <input type="number" class="mata-realisasi rounded-lg px-3 py-1.5 text-sm bg-slate-800 text-white" placeholder="Realisasi">
+            </div>
+        </div>
+    </div>
+</div>
                     
                     <!-- SUBMIT BUTTON -->
                     <div class="flex items-center justify-end gap-3 pt-4">
@@ -876,6 +902,8 @@
                                 <option value="2025">2025</option>
                                 <option value="2026">2026</option>
                                 <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                                <option value="2029">2029</option>
                             </select>
                         </div>
 

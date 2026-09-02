@@ -71,7 +71,7 @@ app.get('/api/dashboard', async (req, res) => {
                 if (!item[keyField]) return item;
                 const lower = item[keyField].toLowerCase(); // Jadikan huruf kecil untuk pencocokan
                 if (!nameMap[lower]) {
-                    nameMap[lower] = item[keyField]; // Simpan versi pertama yang ditemukan (misal: "Rara")
+                    nameMap[lower] = item[keyField]; // Simpan versi pertama yang ditemukan 
                 }
                 // Timpa dengan versi yang sudah diseragamkan
                 return { ...item, [keyField]: nameMap[lower] };
@@ -294,7 +294,7 @@ app.post('/api/login', async (req, res) => {
                 // Jika password cocok
                 res.json({ 
                     success: true, 
-                    message: 'Login berhasil! Mengalihkan...', 
+                    message: 'Login berhasil!', 
                     user: { username: user.username } 
                 });
             } else {
