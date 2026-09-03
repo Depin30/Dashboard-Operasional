@@ -434,7 +434,6 @@
             maintainAspectRatio: false, 
             interaction: { mode: 'index', intersect: false },
             animation: { duration: 600 },
-            
             layout: {
                 padding: {
                     top: 1,
@@ -756,15 +755,31 @@ if (igdR === 0 && igdT === 0 && data.pasien && !Array.isArray(data.pasien)) {
                 setPatientCard('igdTotalText', 'igdPersenBadge', igdR, igdT);
                 setPatientCard('ranapTotalText', 'ranapPersenBadge', ranapR, ranapT);
 
-                // 3. Update Gauge IGD
-                igdGaugeChart.data.datasets[0].needleValue = igdR;
-                igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
-                igdGaugeChart.update();
+               // 3. Update Gauge IGD
+igdGaugeChart.data.datasets[0].needleValue = igdR;
+igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
+igdGaugeChart.update();
 
-                const headerPersen = document.getElementById('igdHeaderPersen');
-                if (headerPersen) headerPersen.style.display = 'none'; 
-                 
-                document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
+// Update teks nilai di tengah
+document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
+
+// Menghitung dan menampilkan persentase di pojok kanan atas
+const igdPersenAtas = igdT > 0 ? ((igdR / igdT) * 100).toFixed(1) : 0;
+const headerPersen = document.getElementById('igdHeaderPersen');
+
+if (headerPersen) {
+    headerPersen.style.display = 'inline-block'; // Pastikan badge muncul (tidak di-none)
+    headerPersen.innerText = `${igdPersenAtas}%`;
+    
+    // Pewarnaan dinamis sama seperti grafik lain
+    if (igdPersenAtas < 50) {
+        headerPersen.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400';
+    } else if (igdPersenAtas >= 100) {
+        headerPersen.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400';
+    } else {
+        headerPersen.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
+    }
+}
 
                 // 4. Sinkronisasi Data Chart ke Kanvas
                 updateChartWithHeader(topPoliChart, poliData, 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
@@ -818,7 +833,6 @@ if (igdR === 0 && igdT === 0 && data.pasien && !Array.isArray(data.pasien)) {
                 console.error('Gagal mensinkronisasikan data dengan admin (MySQL):', err);
             }
         }
-
         let syncInterval = setInterval(updateDashboardFromMySQL, 3000);
         let isSyncActive = true;
 
