@@ -555,14 +555,15 @@
                 { label: 'Realisasi', data: [], backgroundColor: '#8b5cf6', borderRadius: 3, borderSkipped: false }
             ]}, options: commonBarOptions
         });
-
-        const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('2d'), {
+const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: ['Aman', 'Waspada', 'Tinggi'],
+                // Urutan label dibalik
+                labels: ['Tinggi', 'Waspada', 'Aman'],
                 datasets: [{ 
                     data: [33.3, 33.3, 33.4], 
-                    backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(245, 158, 11, 0.85)', 'rgba(225, 29, 72, 0.85)'],
+                    // Urutan warna dibalik: Merah, Kuning, Hijau
+                    backgroundColor: ['rgba(225, 29, 72, 0.85)', 'rgba(245, 158, 11, 0.85)', 'rgba(16, 185, 129, 0.85)'],
                     borderWidth: 3,
                     borderColor: '#0b132b',
                     borderRadius: 6,
@@ -583,8 +584,8 @@
         const borChart = new Chart(document.getElementById('borChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Kapasitas', data: [], backgroundColor: '#1e293b', borderRadius: 3, borderSkipped: false },
-                { label: 'Bed Terisi', data: [], backgroundColor: '#0ea5e9', borderRadius: 3, borderSkipped: false }
+                { label: 'Kapasitas', data: [], backgroundColor: '#006400', borderRadius: 3, borderSkipped: false },
+                { label: 'Bed Terisi', data: [], backgroundColor: '#00FF00', borderRadius: 3, borderSkipped: false }
             ]}, options: commonBarOptions
         });
 
@@ -773,11 +774,11 @@ if (headerPersen) {
     
     // Pewarnaan dinamis sama seperti grafik lain
     if (igdPersenAtas < 50) {
-        headerPersen.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400';
+        headerPersen.className = 'text-[11px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400';
     } else if (igdPersenAtas >= 100) {
-        headerPersen.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400';
+        headerPersen.className = 'text-[11px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400';
     } else {
-        headerPersen.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
+        headerPersen.className = 'text-[11px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
     }
 }
 
