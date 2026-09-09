@@ -357,6 +357,59 @@
         Chart.defaults.plugins.tooltip.cornerRadius = 6;
         Chart.defaults.plugins.tooltip.usePointStyle = true;
 
+        
+        Chart.defaults.plugins.tooltip.callbacks = {
+            label: function(context) {
+                let label = context.dataset.label || '';
+                let value = context.raw || 0;
+                let text = label ? `${label}: ` : '';
+                text += Number(value).toLocaleString('id-ID');
+
+                // Tambahkan persentase di tooltip khusus untuk bar Realisasi (dataset ke-1)
+                if (context.datasetIndex === 1) { 
+                    const target = context.chart.data.datasets[0].data[context.dataIndex] || 0;
+                    if (target > 0) {
+                        const persen = ((value / target) * 100).toFixed(1);
+                        text += ` (${persen}%)`;
+                    }
+                }
+                return text;
+            }
+        };
+
+       const percentageFormatter = (value, context) => {
+            if (value <= 0) return '';
+            const datasetIndex = context.datasetIndex;
+            const dataIndex = context.dataIndex;
+            
+            const targetVal = Number(context.chart.data.datasets[0].data[dataIndex] || 0);
+            
+            if (context.chart.config.type !== 'doughnut' && datasetIndex === 1 && targetVal > 0) {
+                const persen = ((value / targetVal) * 100).toFixed(1);
+                // Persen ditaruh di depan (baris atas), angka realisasi di belakang (baris bawah)
+                return [`${persen}%`, `${value.toLocaleString('id-ID')}`]; 
+            }
+            return value.toLocaleString('id-ID');
+        };
+
+        const getDataLabelColor = (context) => {
+            const datasetIndex = context.datasetIndex;
+            const dataIndex = context.dataIndex;
+            
+            // Hanya evaluasi untuk bar Realisasi (index 1)
+            if (context.chart.config.type !== 'doughnut' && datasetIndex === 1) {
+                const value = Number(context.dataset.data[dataIndex] || 0);
+                const targetVal = Number(context.chart.data.datasets[0].data[dataIndex] || 0);
+                if (targetVal > 0) {
+                    const persen = (value / targetVal) * 100;
+                    if (persen < 50) return '#ef4444';      // Merah
+                    if (persen < 100) return '#f59e0b';     // Kuning
+                    return '#10b981';                       // Hijau (100% atau lebih)
+                }
+            }
+            return '#ffffff'; 
+        };
+
         Chart.register(ChartDataLabels);
 
         const formatMiliar = (val) => {
@@ -367,7 +420,8 @@
         const datalabelsConfig = {
             color: '#ffffff', 
             font: { weight: 'bold', size: 11, family: "'Inter', sans-serif" },
-            formatter: (value) => value > 0 ? value.toLocaleString('id-ID') : ''
+            // Ubah baris di bawah ini
+            formatter: percentageFormatter
         };
 
         const modernGaugeNeedle = {
@@ -429,14 +483,14 @@
             }
         };
 
-        const commonBarOptions = {
+       const commonBarOptions = {
             responsive: true, 
             maintainAspectRatio: false, 
             interaction: { mode: 'index', intersect: false },
             animation: { duration: 600 },
             layout: {
                 padding: {
-                    top: 1,
+                    top: 15, // Ditingkatkan sedikit agar teks 2 baris di atas batang tidak terpotong
                     bottom: 10  
                 }
             },
@@ -455,19 +509,19 @@
                     }
                 },
                 datalabels: { 
-                    color: '#ffffff',
+                    color: getDataLabelColor, 
                     font: { weight: 'bold', size: 10, family: "'Inter', sans-serif" }, 
                     anchor: 'end', 
                     align: 'top', 
                     offset: 3,
-                    formatter: (value) => value > 0 ? value.toLocaleString('id-ID') : ''
-                } 
+                    formatter: percentageFormatter
+                }
             },
             scales: { 
                 y: { 
                     grid: { display: false },
                     beginAtZero: true,
-                    grace: '45%',
+                    grace: '55%', // Ditambahkan sedikit ruang kosong di atas batang agar persentase muat
                     ticks: { font: { family: "'Inter', sans-serif", size: 10, weight: '500' }, color: '#94a3b8' }
                 }, 
                 x: { 
@@ -483,7 +537,7 @@
             }
         };
 
-    const commonHorizontalOptions = { 
+   const commonHorizontalOptions = { 
             indexAxis: 'y', 
             responsive: true, 
             maintainAspectRatio: false, 
@@ -493,7 +547,7 @@
             layout: {
                 padding: {
                     top: 1,
-                    right: 3
+                    right: 45 // Diperlebar sedikit agar teks persentase di ujung tidak terpotong
                 }
             },
             
@@ -511,11 +565,26 @@
                     } 
                 },
                 datalabels: { 
-                    ...datalabelsConfig, 
-                    color: '#ffffff',
+                    color: getDataLabelColor,
+                    font: { weight: 'bold', size: 10, family: "'Inter', sans-serif" },
                     anchor: 'end', 
-                    align: 'right', 
-                    offset: 4 
+                    align: 'right', // Posisi di sebelah kanan ujung bar
+                    offset: 4,
+                    formatter: (value, context) => {
+                        if (value <= 0) return '';
+                        const datasetIndex = context.datasetIndex;
+                        const dataIndex = context.dataIndex;
+                        
+                        // Ambil nilai Target dari dataset ke-0
+                        const targetVal = Number(context.chart.data.datasets[0].data[dataIndex] || 0);
+                        
+                        // Khusus untuk bar Realisasi (index 1), tampilkan 2 baris: Angka & Persentase
+                        if (datasetIndex === 1 && targetVal > 0) {
+                            const persen = ((value / targetVal) * 100).toFixed(1);
+                            return [`${value.toLocaleString('id-ID')}`, `${persen}%`]; 
+                        }
+                        return value.toLocaleString('id-ID');
+                    }
                 } 
             },
             scales: { 
@@ -525,7 +594,7 @@
                 x: { 
                     border: { dash: [4, 4], display: false }, 
                     beginAtZero: true, 
-                    grace: '35%'
+                    grace: '25%' // Menambah ruang kosong di sebelah kanan grafik
                 } 
             }
         };
