@@ -11,33 +11,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        plasma: { bg: '#050814', card: '#0b132b', border: '#1e293b', accent: '#3b82f6' }
-                    }
-                }
-            }
-        }
-    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     
     <style>
-        html, body { height: 100vh; width: 100vw; overflow: hidden; margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #050814; color: #f1f5f9; }
-        .card-plasma { background: #0b132b; border: 1px solid #1e293b; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4); overflow: hidden; position: relative; display: flex; flex-direction: column; transition: all 0.3s ease; }
-        .card-plasma:hover { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.15); }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #050814; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        html, body { height: 100vh; width: 100vw; overflow: hidden; margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .card-light { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: hidden; position: relative; display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .card-light:hover { border-color: #cbd5e1; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="flex h-screen w-screen overflow-hidden antialiased selection:bg-blue-600 selection:text-white">
+<body class="flex h-screen w-screen overflow-hidden antialiased selection:bg-blue-100 selection:text-blue-700">
 
-    <aside id="sidebar" class="w-64 bg-[#080e21] text-white flex flex-col justify-between shrink-0 border-r border-slate-800/80 z-20 h-full transition-all duration-300 overflow-hidden">
+    <aside id="sidebar" class="w-64 bg-[#070b19] text-white flex flex-col justify-between shrink-0 border-r border-slate-800 z-20 h-full transition-all duration-300 overflow-hidden">
         <div class="p-4 w-64 shrink-0">
             <div class="mb-6 flex items-center gap-3">
                 <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -51,40 +41,30 @@
             
             <div class="space-y-1">
                 <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 mb-1.5">Command Center</p>
-                <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-600/20 text-blue-400 font-semibold text-xs border border-blue-500/30 shadow-sm transition">
+                <a href="/" class="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-600/20 text-blue-400 font-semibold text-xs border border-blue-500/30 shadow-sm transition">
                     <i class="fa-solid fa-chart-pie w-4 text-center"></i> Display Dashboard
                 </a>
-                <a href="/admin" target="_blank" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
+                <a href="/admin" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
                     <i class="fa-solid fa-pen-to-square w-4 text-center"></i> Entry & Kelola Data
                 </a>
             </div>
         </div>
 
         <div class="p-4 w-64 shrink-0 space-y-3">
-            <div class="bg-[#050814] p-3 rounded-xl border border-slate-800 text-xs">
-                <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-slate-400 font-medium text-[10px]">Database MySQL</span>
-                    <span class="flex h-2 w-2 relative">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                </div>
-                <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-800/80">
-                    <span class="text-slate-500">Sinkronisasi:</span>
-                    <span id="lastUpdateText" class="font-mono text-emerald-400 font-medium">--:--:--</span>
-                </div>
+            <div id="adminUserBadge" class="text-[10px] bg-[#050814] px-3 py-2 rounded-xl border border-slate-800 text-slate-300 font-medium truncate">
+                Admin: Aktif
             </div>
             <button onclick="logout()" class="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-right-from-bracket"></i> Keluar (Logout)
             </button>
-            <div class="text-[9px] text-slate-600 text-center font-medium">&copy; 2026 SIMRS IT Department</div>
+            <div class="text-[9px] text-slate-500 text-center font-medium">&copy; 2026 SIMRS IT Department</div>
         </div>
     </aside>
 
-    <main class="flex-1 h-full overflow-hidden flex flex-col min-h-0 bg-plasma-bg">
-        <header class="bg-[#0b132b]/90 backdrop-blur-md px-6 py-2.5 border-b border-slate-800 flex justify-between items-center shrink-0 z-30">
+    <main class="flex-1 h-full overflow-hidden flex flex-col min-h-0 bg-slate-50">
+        <header class="bg-black/95 backdrop-blur-md px-6 py-2.5 border-b border-slate-800 flex justify-between items-center shrink-0 z-30 shadow-sm">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm">
+                <button onclick="toggleSidebar()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center">
                     <i class="fa-solid fa-bars text-sm"></i>
                 </button>
                 <div>
@@ -96,174 +76,173 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <!-- TOMBOL FULL SCREEN -->
-                <button onclick="toggleFullScreen()" title="Layar Penuh" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                <button onclick="toggleFullScreen()" title="Layar Penuh" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 shadow-sm px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-expand" id="fullScreenIcon"></i> <span id="fullScreenText">Full Screen</span>
                 </button>
                 
-                <button onclick="manualRefresh()" title="Ambil data terbaru sekarang" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                <button onclick="manualRefresh()" title="Ambil data terbaru sekarang" class="bg-blue-950/60 hover:bg-blue-900/80 text-blue-400 border border-blue-800/60 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> Refresh
                 </button>
-                <button id="toggleSyncBtn" onclick="toggleSync()" title="Jeda atau Lanjutkan Sinkronisasi Otomatis" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                <button id="toggleSyncBtn" onclick="toggleSync()" title="Jeda atau Lanjutkan Sinkronisasi Otomatis" class="bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-400 border border-emerald-800/60 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-pause" id="syncIcon"></i> <span id="syncText">Live: Aktif</span>
                 </button>
-                <div class="flex items-center gap-2 bg-[#050814] px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 border border-slate-800">
+                <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 border border-slate-800">
                     <i class="fa-regular fa-calendar-days text-blue-400"></i>
                     <span id="currentDateIndicator">Memuat tanggal...</span>
                 </div>
             </div>
         </header>
 
-        <div class="p-2.5 flex-1 grid grid-rows-[auto_minmax(0,1fr)_105px] gap-2 overflow-hidden max-w-[1700px] w-full mx-auto min-h-0">
+        <div class="p-3 flex-1 grid grid-rows-[auto_minmax(0,1fr)_105px] gap-3 overflow-hidden max-w-[1700px] w-full mx-auto min-h-0">
             <!-- Summary Cards -->
-            <div class="grid grid-cols-1 lg:grid-cols-6 gap-2.5">
-                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+            <div class="grid grid-cols-1 lg:grid-cols-6 gap-3">
+                <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div>
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Target Pendapatan</span>
-                        <h3 id="targetFinansialText" class="text-base font-black text-white tracking-tight mt-0.5">Rp 0</h3>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Target Pendapatan</span>
+                        <h3 id="targetFinansialText" class="text-base font-black text-slate-800 tracking-tight mt-0.5">Rp 0</h3>
                     </div>
-                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex justify-center items-center text-xs border border-blue-500/20"><i class="fa-solid fa-bullseye"></i></div>
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex justify-center items-center text-sm border border-blue-200"><i class="fa-solid fa-bullseye"></i></div>
                 </div>
 
-                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div class="w-full">
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Realisasi Pendapatan</span>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Realisasi Pendapatan</span>
                         <div class="flex items-baseline gap-2 mt-0.5">
-                            <h3 id="realisasiText" class="text-base font-black text-white tracking-tight">Rp 0</h3>
-                            <span id="persenRealisasiText" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">0%</span>
+                            <h3 id="realisasiText" class="text-base font-black text-slate-800 tracking-tight">Rp 0</h3>
+                            <span id="persenRealisasiText" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0%</span>
                         </div>
                     </div>
-                    <div class="w-7 h-7 shrink-0 rounded-lg bg-emerald-500/10 text-emerald-400 flex justify-center items-center text-xs border border-emerald-500/20"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="w-8 h-8 shrink-0 rounded-lg bg-emerald-100 text-emerald-600 flex justify-center items-center text-sm border border-emerald-200"><i class="fa-solid fa-wallet"></i></div>
                 </div>
 
-                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div>
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Gap / Selisih Target</span>
-                        <h3 id="gapText" class="text-base font-black text-white tracking-tight mt-0.5">Rp 0</h3>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Gap / Selisih Target</span>
+                        <h3 id="gapText" class="text-base font-black text-slate-800 tracking-tight mt-0.5">Rp 0</h3>
                     </div>
-                    <div class="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex justify-center items-center text-xs border border-purple-500/20"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex justify-center items-center text-sm border border-purple-200"><i class="fa-solid fa-chart-line"></i></div>
                 </div>
 
-                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div>
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Rawat Jalan (R / T)</span>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rawat Jalan (R / T)</span>
                         <div class="flex items-baseline gap-1 mt-0.5">
-                            <h3 id="rajalTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
+                            <h3 id="rajalTotalText" class="text-sm font-black text-slate-800 tracking-tight">0 / 0</h3>
                         </div>
                     </div>
-                    <span id="rajalPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">0%</span>
+                    <span id="rajalPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0%</span>
                 </div>
 
-                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div>
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">IGD Pasien (R / T)</span>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">IGD Pasien (R / T)</span>
                         <div class="flex items-baseline gap-1 mt-0.5">
-                            <h3 id="igdTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
+                            <h3 id="igdTotalText" class="text-sm font-black text-slate-800 tracking-tight">0 / 0</h3>
                         </div>
                     </div>
-                    <span id="igdPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">0%</span>
+                    <span id="igdPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0%</span>
                 </div>
 
-                <div class="card-plasma px-3.5 py-2 rounded-xl flex items-center justify-between">
+                <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div>
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Rawat Inap (R / T)</span>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rawat Inap (R / T)</span>
                         <div class="flex items-baseline gap-1 mt-0.5">
-                            <h3 id="ranapTotalText" class="text-sm font-black text-white tracking-tight">0 / 0</h3>
+                            <h3 id="ranapTotalText" class="text-sm font-black text-slate-800 tracking-tight">0 / 0</h3>
                         </div>
                     </div>
-                    <span id="ranapPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">0%</span>
+                    <span id="ranapPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0%</span>
                 </div>
             </div>
 
             <!-- Charts Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-2.5 min-h-0">
+            <div class="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-3 min-h-0">
                 
-                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-[9px] border border-blue-500/20"><i class="fa-solid fa-hospital-user"></i></div>
-                            <h3 class="font-bold text-white text-xs">Top Poliklinik</h3>
+                            <div class="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs border border-blue-200"><i class="fa-solid fa-hospital-user"></i></div>
+                            <h3 class="font-bold text-slate-800 text-xs">Top Poliklinik</h3>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span id="poliTotalText" class="text-[9px] font-semibold text-slate-400">0 / 0</span>
-                            <span id="poliPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-400">0%</span>
+                            <span id="poliTotalText" class="text-[10px] font-semibold text-slate-500">0 / 0</span>
+                            <span id="poliPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200">0%</span>
                         </div>
                     </div>
                     <div class="relative w-full flex-1 min-h-0"><canvas id="topPoliChart"></canvas></div>
                 </div>
                 
-                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded bg-pink-500/10 text-pink-400 flex items-center justify-center text-[9px] border border-pink-500/20"><i class="fa-solid fa-baby"></i></div>
-                            <h3 class="font-bold text-white text-xs">Top Kebidanan</h3>
+                            <div class="w-6 h-6 rounded bg-pink-100 text-pink-600 flex items-center justify-center text-xs border border-pink-200"><i class="fa-solid fa-baby"></i></div>
+                            <h3 class="font-bold text-slate-800 text-xs">Top Kebidanan</h3>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span id="kebidananTotalText" class="text-[9px] font-semibold text-slate-400">0 / 0</span>
-                            <span id="kebidananPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-pink-500/20 text-pink-400">0%</span>
+                            <span id="kebidananTotalText" class="text-[10px] font-semibold text-slate-500">0 / 0</span>
+                            <span id="kebidananPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-pink-50 text-pink-600 border border-pink-200">0%</span>
                         </div>
                     </div>
                     <div class="relative w-full flex-1 min-h-0"><canvas id="kebidananChart"></canvas></div>
                 </div>
 
-                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded bg-violet-500/10 text-violet-400 flex items-center justify-center text-[9px] border border-violet-500/20"><i class="fa-solid fa-bed-pulse"></i></div>
-                            <h3 class="font-bold text-white text-xs">Kamar Operasi (OK)</h3>
+                            <div class="w-6 h-6 rounded bg-violet-100 text-violet-600 flex items-center justify-center text-xs border border-violet-200"><i class="fa-solid fa-bed-pulse"></i></div>
+                            <h3 class="font-bold text-slate-800 text-xs">Kamar Operasi (OK)</h3>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span id="operasiTotalText" class="text-[9px] font-semibold text-slate-400">0 / 0</span>
-                            <span id="operasiPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-violet-500/20 text-violet-400">0%</span>
+                            <span id="operasiTotalText" class="text-[10px] font-semibold text-slate-500">0 / 0</span>
+                            <span id="operasiPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-violet-50 text-violet-600 border border-violet-200">0%</span>
                         </div>
                     </div>
                     <div class="relative w-full flex-1 min-h-0"><canvas id="kamarOperasiChart"></canvas></div>
                 </div>
 
                 <!-- IGD Gauge -->
-                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0 relative overflow-hidden border-blue-500/30">
-                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-48 h-24 bg-blue-500/10 blur-3xl pointer-events-none z-0"></div>
+                <div class="card-light p-3 flex flex-col justify-between min-h-0 relative overflow-hidden">
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-48 h-24 bg-blue-100 blur-3xl pointer-events-none z-0"></div>
                     
                     <div class="flex justify-between items-center mb-1 shrink-0 relative z-10">
                         <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-[9px] border border-blue-500/20"><i class="fa-solid fa-gauge-high"></i></div>
-                            <h3 class="font-bold text-white text-xs">Capaian IGD</h3>
+                            <div class="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs border border-blue-200"><i class="fa-solid fa-gauge-high"></i></div>
+                            <h3 class="font-bold text-slate-800 text-xs">Capaian IGD</h3>
                         </div>
-                        <span id="igdHeaderPersen" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">0%</span>
+                        <span id="igdHeaderPersen" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">0%</span>
                     </div>
                     
                     <div class="relative flex justify-center items-center flex-1 min-h-0 z-10 mt-2">
                         <canvas id="igdChart"></canvas>
                         <div class="absolute inset-x-0 bottom-1 flex flex-col items-center justify-center pointer-events-none">
-                            <span id="igdCenterValue" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 tracking-tight leading-none drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">0</span>
-                            <span id="igdCenterSub" class="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-wider">Pasien Masuk</span>
+                            <span id="igdCenterValue" class="text-2xl font-black text-slate-800 tracking-tight leading-none">0</span>
+                            <span id="igdCenterSub" class="text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-wider">Pasien Masuk</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded bg-slate-800 text-slate-300 flex items-center justify-center text-[9px] border border-slate-700"><i class="fa-solid fa-bed"></i></div>
-                            <h3 class="font-bold text-white text-xs">BOR Rawat Inap</h3>
+                            <div class="w-6 h-6 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-xs border border-slate-200"><i class="fa-solid fa-bed"></i></div>
+                            <h3 class="font-bold text-slate-800 text-xs">BOR Rawat Inap</h3>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span id="borInfoText" class="text-[9px] font-semibold text-slate-400">Isi: 0 / Kap: 0</span>
-                            <span id="borTotalText" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-800 text-slate-300">0%</span>
+                            <span id="borInfoText" class="text-[10px] font-semibold text-slate-500">Isi: 0 / Kap: 0</span>
+                            <span id="borTotalText" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0%</span>
                         </div>
                     </div>
                     <div class="relative w-full flex-1 min-h-0"><canvas id="borChart"></canvas></div>
                 </div>
 
-                <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
+                <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-[9px] border border-cyan-500/20"><i class="fa-solid fa-eye"></i></div>
-                            <h3 class="font-bold text-white text-xs">Top OK Mata</h3>
+                            <div class="w-6 h-6 rounded bg-cyan-100 text-cyan-600 flex items-center justify-center text-xs border border-cyan-200"><i class="fa-solid fa-eye"></i></div>
+                            <h3 class="font-bold text-slate-800 text-xs">Top OK Mata</h3>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span id="mataTotalText" class="text-[9px] font-semibold text-slate-400">0 / 0</span>
-                            <span id="mataPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-400">0%</span>
+                            <span id="mataTotalText" class="text-[10px] font-semibold text-slate-500">0 / 0</span>
+                            <span id="mataPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-600 border border-cyan-200">0%</span>
                         </div>
                     </div>
                     <div class="relative w-full flex-1 min-h-0"><canvas id="dokterMataChart"></canvas></div>
@@ -271,15 +250,15 @@
             </div>
 
             <!-- Tren Chart -->
-            <div class="card-plasma p-2.5 rounded-xl flex flex-col justify-between min-h-0">
-                <div class="flex justify-between items-center mb-1 shrink-0">
+            <div class="card-light p-3 flex flex-col justify-between min-h-0">
+                <div class="flex justify-between items-center mb-2 shrink-0">
                     <div class="flex items-center gap-2">
-                        <div class="w-5 h-5 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-[9px] border border-emerald-500/20"><i class="fa-solid fa-chart-area"></i></div>
-                        <h3 class="font-bold text-white text-xs">Tren Pendapatan Harian vs Target</h3>
+                        <div class="w-6 h-6 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs border border-emerald-200"><i class="fa-solid fa-chart-area"></i></div>
+                        <h3 class="font-bold text-slate-800 text-xs">Tren Pendapatan Harian vs Target</h3>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span id="trenTotalText" class="text-[9px] font-semibold text-slate-400">Realisasi: Rp 0 / Target: Rp 0</span>
-                        <span id="trenPersenBadge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400">0%</span>
+                        <span id="trenTotalText" class="text-[10px] font-semibold text-slate-500">Realisasi: Rp 0 / Target: Rp 0</span>
+                        <span id="trenPersenBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">0%</span>
                     </div>
                 </div>
                 <div class="relative w-full flex-1 min-h-0"><canvas id="pendapatanChart"></canvas></div>
@@ -288,45 +267,27 @@
     </main>
 
     <script>
-        
-        // AUTH GUARD
-        if (!localStorage.getItem('isLoggedIn')) {
-            window.location.href = '/login';
-        }
-
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userName');
-            window.location.href = '/login';
-        }
-
+        // AUTH GUARD & UTILS
+        if (!localStorage.getItem('isLoggedIn')) { window.location.href = '/login'; }
+        function logout() { localStorage.removeItem('isLoggedIn'); localStorage.removeItem('userName'); window.location.href = '/login'; }
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('w-64');
             sidebar.classList.toggle('w-0');
         }
-
-        // FUNGSI TOGGLE FULL SCREEN
         function toggleFullScreen() {
             const icon = document.getElementById('fullScreenIcon');
             const text = document.getElementById('fullScreenText');
-            
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.error(`Gagal masuk ke mode Fullscreen: ${err.message}`);
-                });
+                document.documentElement.requestFullscreen().catch(err => console.error(err));
                 if (icon) icon.className = 'fa-solid fa-compress';
                 if (text) text.innerText = 'Exit Fullscreen';
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
+                if (document.exitFullscreen) document.exitFullscreen();
                 if (icon) icon.className = 'fa-solid fa-expand';
                 if (text) text.innerText = 'Full Screen';
             }
         }
-
-        // Listener untuk mengubah ikon ketika pengguna menekan tombol ESC keyboard
         document.addEventListener('fullscreenchange', () => {
             const icon = document.getElementById('fullScreenIcon');
             const text = document.getElementById('fullScreenText');
@@ -339,89 +300,130 @@
             }
         });
 
-        // DEFAULTS CHART.JS
-        Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = '#94a3b8';
-        Chart.defaults.scale.grid.color = 'rgba(30, 41, 59, 0.6)';
-        Chart.defaults.scale.grid.lineWidth = 1;
-        Chart.defaults.scale.ticks.font = { size: 10, weight: '500', family: "'Inter', sans-serif" }; 
-        
-        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.95)';
-        Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
-        Chart.defaults.plugins.tooltip.bodyColor = '#e2e8f0';
-        Chart.defaults.plugins.tooltip.borderColor = '#334155';
-        Chart.defaults.plugins.tooltip.borderWidth = 1;
-        Chart.defaults.plugins.tooltip.titleFont = { family: "'Inter', sans-serif", size: 12, weight: '700' };
-        Chart.defaults.plugins.tooltip.bodyFont = { family: "'Inter', sans-serif", size: 11 };
-        Chart.defaults.plugins.tooltip.padding = 6;
-        Chart.defaults.plugins.tooltip.cornerRadius = 6;
-        Chart.defaults.plugins.tooltip.usePointStyle = true;
-
-        
-        Chart.defaults.plugins.tooltip.callbacks = {
-            label: function(context) {
-                let label = context.dataset.label || '';
-                let value = context.raw || 0;
-                let text = label ? `${label}: ` : '';
-                text += Number(value).toLocaleString('id-ID');
-
-                // Tambahkan persentase di tooltip khusus untuk bar Realisasi (dataset ke-1)
-                if (context.datasetIndex === 1) { 
-                    const target = context.chart.data.datasets[0].data[context.dataIndex] || 0;
-                    if (target > 0) {
-                        const persen = ((value / target) * 100).toFixed(1);
-                        text += ` (${persen}%)`;
-                    }
-                }
-                return text;
-            }
-        };
-
-       const percentageFormatter = (value, context) => {
-            if (value <= 0) return '';
-            const datasetIndex = context.datasetIndex;
-            const dataIndex = context.dataIndex;
-            
-            const targetVal = Number(context.chart.data.datasets[0].data[dataIndex] || 0);
-            
-            if (context.chart.config.type !== 'doughnut' && datasetIndex === 1 && targetVal > 0) {
-                const persen = ((value / targetVal) * 100).toFixed(1);
-                // Persen ditaruh di depan (baris atas), angka realisasi di belakang (baris bawah)
-                return [`${persen}%`, `${value.toLocaleString('id-ID')}`]; 
-            }
-            return value.toLocaleString('id-ID');
-        };
-
-        const getDataLabelColor = (context) => {
-            const datasetIndex = context.datasetIndex;
-            const dataIndex = context.dataIndex;
-            
-            // Hanya evaluasi untuk bar Realisasi (index 1)
-            if (context.chart.config.type !== 'doughnut' && datasetIndex === 1) {
-                const value = Number(context.dataset.data[dataIndex] || 0);
-                const targetVal = Number(context.chart.data.datasets[0].data[dataIndex] || 0);
-                if (targetVal > 0) {
-                    const persen = (value / targetVal) * 100;
-                    if (persen < 50) return '#ef4444';      // Merah
-                    if (persen < 100) return '#f59e0b';     // Kuning
-                    return '#10b981';                       // Hijau (100% atau lebih)
-                }
-            }
-            return '#ffffff'; 
-        };
-
-        Chart.register(ChartDataLabels);
-
         const formatMiliar = (val) => {
             const inMiliar = val / 1000000000;
             return `Rp ${inMiliar.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })}m`;
         };
 
-        const datalabelsConfig = {
-            color: '#ffffff', 
-            font: { weight: 'bold', size: 11, family: "'Inter', sans-serif" },
-            // Ubah baris di bawah ini
-            formatter: percentageFormatter
+        Chart.register(ChartDataLabels);
+
+        // DEFAULT CHART.JS (TEMA TERANG)
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b'; 
+        Chart.defaults.scale.grid.color = '#f1f5f9'; 
+        Chart.defaults.scale.grid.lineWidth = 1;
+        Chart.defaults.scale.ticks.font = { size: 10, weight: '500', family: "'Inter', sans-serif" }; 
+        
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+        Chart.defaults.plugins.tooltip.titleColor = '#0f172a'; 
+        Chart.defaults.plugins.tooltip.bodyColor = '#334155'; 
+        Chart.defaults.plugins.tooltip.borderColor = '#e2e8f0';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.titleFont = { family: "'Inter', sans-serif", size: 12, weight: '700' };
+        Chart.defaults.plugins.tooltip.bodyFont = { family: "'Inter', sans-serif", size: 11 };
+        Chart.defaults.plugins.tooltip.padding = 8;
+        Chart.defaults.plugins.tooltip.cornerRadius = 6;
+        Chart.defaults.plugins.tooltip.usePointStyle = true;
+
+        const tooltipConfig = {
+            callbacks: {
+                label: function(context) {
+                    try {
+                        let label = context.dataset.label || '';
+                        let value = context.raw || 0;
+                        let text = label ? `${label}: ` : '';
+                        text += Number(value).toLocaleString('id-ID');
+                        if (context.datasetIndex === 1 && context.chart.data && context.chart.data.datasets) {
+                            const targetDataset = context.chart.data.datasets[0];
+                            if (targetDataset && targetDataset.data) {
+                                const target = Number(targetDataset.data[context.dataIndex] || 0);
+                                if (target > 0) {
+                                    const persen = ((value / target) * 100).toFixed(1);
+                                    text += ` (${persen}%)`;
+                                }
+                            }
+                        }
+                        return text;
+                    } catch (e) {
+                        return `${context.dataset.label || ''}: ${context.raw || 0}`;
+                    }
+                }
+            }
+        };
+
+        const commonBarOptions = {
+            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, animation: { duration: 600 },
+            layout: { padding: { top: 20, bottom: 5 } },
+            plugins: { 
+                legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, font: { size: 10, weight: '500' }, color: '#475569', padding: 10 } },
+                tooltip: tooltipConfig,
+                datalabels: { 
+                    labels: {
+                        percent: {
+                            align: 'end', anchor: 'end', font: { weight: 'bold', size: 10 },
+                            color: (context) => {
+                                if (context.datasetIndex !== 1) return 'transparent'; 
+                                const target = context.chart.data.datasets[0].data[context.dataIndex] || 0;
+                                const val = context.dataset.data[context.dataIndex] || 0;
+                                if (target > 0) {
+                                    const p = (val/target)*100;
+                                    if (p < 50) return '#dc2626'; 
+                                    if (p < 100) return '#d97706'; 
+                                    return '#059669'; 
+                                }
+                                return 'transparent';
+                            },
+                            formatter: (value, context) => {
+                                if (context.datasetIndex !== 1 || value <= 0) return '';
+                                const target = context.chart.data.datasets[0].data[context.dataIndex] || 0;
+                                if (target > 0) return ((value/target)*100).toFixed(1) + '%';
+                                return '';
+                            }
+                        },
+                        value: {
+                            align: 'end', anchor: 'end', offset: 14, font: { weight: 'bold', size: 10 },
+                            color: '#475569', 
+                            formatter: (value) => value > 0 ? value.toLocaleString('id-ID') : ''
+                        }
+                    }
+                }
+            },
+            scales: { 
+                y: { grid: { display: false }, beginAtZero: true, grace: '30%', ticks: { color: '#64748b' } }, 
+                x: { grid: { display: false }, ticks: { color: '#64748b', maxRotation: 0, minRotation: 0, autoSkip: false } } 
+            }
+        };
+
+        const commonHorizontalOptions = { 
+            indexAxis: 'y', responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, animation: { duration: 600 },
+            layout: { padding: { right: 55 } },
+            plugins: { 
+                legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, font: { size: 10, weight: '500' }, color: '#475569' } },
+                tooltip: tooltipConfig,
+                datalabels: { 
+                    align: 'right', anchor: 'end', offset: 4, font: { weight: 'bold', size: 10 },
+                    color: (context) => {
+                        if (context.datasetIndex === 0) return '#64748b'; 
+                        const target = context.chart.data.datasets[0].data[context.dataIndex] || 0;
+                        const val = context.dataset.data[context.dataIndex] || 0;
+                        if (target > 0) {
+                            const p = (val/target)*100;
+                            if (p < 50) return '#dc2626'; 
+                            if (p < 100) return '#d97706'; 
+                            return '#059669'; 
+                        }
+                        return '#475569';
+                    },
+                    formatter: (value, context) => {
+                        if (value <= 0) return '';
+                        if (context.datasetIndex === 0) return value.toLocaleString('id-ID'); 
+                        const target = context.chart.data.datasets[0].data[context.dataIndex] || 0;
+                        if (target > 0) return `${value.toLocaleString('id-ID')} (${((value/target)*100).toFixed(1)}%)`;
+                        return value.toLocaleString('id-ID');
+                    }
+                } 
+            },
+            scales: { y: { grid: { display: false } }, x: { border: { display: false }, beginAtZero: true, grace: '25%' } }
         };
 
         const modernGaugeNeedle = {
@@ -431,218 +433,70 @@
                 const meta = chart.getDatasetMeta(0);
                 if (!meta || !meta.data || !meta.data[0]) return;
 
-                const xCenter = meta.data[0].x;
-                const yCenter = meta.data[0].y;
-                const outerRadius = meta.data[0].outerRadius;
-                const innerRadius = meta.data[0].innerRadius;
+                const xCenter = meta.data[0].x, yCenter = meta.data[0].y;
+                const outerRadius = meta.data[0].outerRadius, innerRadius = meta.data[0].innerRadius;
                 const needleLength = innerRadius + (outerRadius - innerRadius) / 2; 
 
                 const needleValue = data.datasets[0].needleValue || 0;
                 const minValue = data.datasets[0].minValue || 0;
                 const maxValue = data.datasets[0].maxValue || 1000;
-
                 let percentage = (needleValue - minValue) / (maxValue - minValue);
-                if (percentage < 0) percentage = 0;
-                if (percentage > 1) percentage = 1;
-                
+                if (percentage < 0) percentage = 0; if (percentage > 1) percentage = 1;
                 const angle = Math.PI + (percentage * Math.PI);
 
-                ctx.save();
-                ctx.translate(xCenter, yCenter);
-                ctx.rotate(angle);
-
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = '#f8fafc';
-
-                ctx.beginPath();
-                ctx.moveTo(0, -2);
-                ctx.lineTo(needleLength - 5, -1);
-                ctx.lineTo(needleLength, 0);
-                ctx.lineTo(needleLength - 5, 1);
-                ctx.lineTo(0, 2);
-                ctx.fillStyle = '#ffffff';
+                ctx.save(); ctx.translate(xCenter, yCenter); ctx.rotate(angle);
+                ctx.beginPath(); ctx.moveTo(0, -2); ctx.lineTo(needleLength - 5, -1); ctx.lineTo(needleLength, 0);
+                ctx.lineTo(needleLength - 5, 1); ctx.lineTo(0, 2);
+                ctx.fillStyle = '#475569'; 
                 ctx.fill();
 
-                ctx.shadowBlur = 0;
-
-                ctx.beginPath();
-                ctx.arc(0, 0, 7, 0, Math.PI * 2);
-                ctx.fillStyle = '#0b132b'; 
+                ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff'; 
                 ctx.fill();
-                
-                ctx.lineWidth = 2.5;
-                ctx.strokeStyle = '#3b82f6'; 
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffffff';
-                ctx.fill();
-
+                ctx.lineWidth = 2.5; ctx.strokeStyle = '#3b82f6'; ctx.stroke();
                 ctx.restore();
             }
         };
 
-       const commonBarOptions = {
-            responsive: true, 
-            maintainAspectRatio: false, 
-            interaction: { mode: 'index', intersect: false },
-            animation: { duration: 600 },
-            layout: {
-                padding: {
-                    top: 15, // Ditingkatkan sedikit agar teks 2 baris di atas batang tidak terpotong
-                    bottom: 10  
-                }
-            },
-            
-            plugins: { 
-                legend: { 
-                    display: true,       
-                    position: 'top',     
-                    align: 'end',
-                    labels: {
-                        boxWidth: 10,
-                        boxHeight: 10,
-                        font: { family: "'Inter', sans-serif", size: 10, weight: '500' },
-                        color: '#64748b',
-                        padding: 15
-                    }
-                },
-                datalabels: { 
-                    color: getDataLabelColor, 
-                    font: { weight: 'bold', size: 10, family: "'Inter', sans-serif" }, 
-                    anchor: 'end', 
-                    align: 'top', 
-                    offset: 3,
-                    formatter: percentageFormatter
-                }
-            },
-            scales: { 
-                y: { 
-                    grid: { display: false },
-                    beginAtZero: true,
-                    grace: '55%', // Ditambahkan sedikit ruang kosong di atas batang agar persentase muat
-                    ticks: { font: { family: "'Inter', sans-serif", size: 10, weight: '500' }, color: '#94a3b8' }
-                }, 
-                x: { 
-                    grid: { display: false },
-                    ticks: { 
-                        font: { family: "'Inter', sans-serif", size: 8, weight: '500' }, 
-                        color: '#94a3b8',
-                        maxRotation: 0,  
-                        minRotation: 0,
-                        autoSkip: false 
-                    } 
-                } 
-            }
-        };
+        const targetColor = '#e2e8f0'; 
 
-   const commonHorizontalOptions = { 
-            indexAxis: 'y', 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            interaction: { mode: 'index', intersect: false },
-            animation: { duration: 600 },
-            
-            layout: {
-                padding: {
-                    top: 1,
-                    right: 45 // Diperlebar sedikit agar teks persentase di ujung tidak terpotong
-                }
-            },
-            
-            plugins: { 
-                legend: { 
-                    display: true,
-                    position: 'top',
-                    align: 'end',
-                    labels: { 
-                        usePointStyle: true, 
-                        boxWidth: 6, 
-                        boxHeight: 6, 
-                        font: { weight: 600, size: 10, family: "'Inter', sans-serif" }, 
-                        color: '#f8fafc' 
-                    } 
-                },
-                datalabels: { 
-                    color: getDataLabelColor,
-                    font: { weight: 'bold', size: 10, family: "'Inter', sans-serif" },
-                    anchor: 'end', 
-                    align: 'right', // Posisi di sebelah kanan ujung bar
-                    offset: 4,
-                    formatter: (value, context) => {
-                        if (value <= 0) return '';
-                        const datasetIndex = context.datasetIndex;
-                        const dataIndex = context.dataIndex;
-                        
-                        // Ambil nilai Target dari dataset ke-0
-                        const targetVal = Number(context.chart.data.datasets[0].data[dataIndex] || 0);
-                        
-                        // Khusus untuk bar Realisasi (index 1), tampilkan 2 baris: Angka & Persentase
-                        if (datasetIndex === 1 && targetVal > 0) {
-                            const persen = ((value / targetVal) * 100).toFixed(1);
-                            return [`${value.toLocaleString('id-ID')}`, `${persen}%`]; 
-                        }
-                        return value.toLocaleString('id-ID');
-                    }
-                } 
-            },
-            scales: { 
-                y: { 
-                    grid: { display: false } 
-                }, 
-                x: { 
-                    border: { dash: [4, 4], display: false }, 
-                    beginAtZero: true, 
-                    grace: '25%' // Menambah ruang kosong di sebelah kanan grafik
-                } 
-            }
-        };
-       
-
-        // INISIALISASI CHART
         const topPoliChart = new Chart(document.getElementById('topPoliChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Target', data: [], backgroundColor: '#1e3a8a', borderRadius: 3, borderSkipped: false },
-                { label: 'Realisasi', data: [], backgroundColor: '#3b82f6', borderRadius: 3, borderSkipped: false }
+                { label: 'Target', data: [], backgroundColor: targetColor, borderRadius: 4 },
+                { label: 'Realisasi', data: [], backgroundColor: '#3b82f6', borderRadius: 4 }
             ]}, options: commonBarOptions
         });
 
         const kebidananChart = new Chart(document.getElementById('kebidananChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Target', data: [], backgroundColor: '#831843', borderRadius: 3, borderSkipped: false },
-                { label: 'Realisasi', data: [], backgroundColor: '#ec4899', borderRadius: 3, borderSkipped: false }
+                { label: 'Target', data: [], backgroundColor: targetColor, borderRadius: 4 },
+                { label: 'Realisasi', data: [], backgroundColor: '#ec4899', borderRadius: 4 }
             ]}, options: commonHorizontalOptions
         });
 
         const kamarOperasiChart = new Chart(document.getElementById('kamarOperasiChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Target', data: [], backgroundColor: '#4c1d95', borderRadius: 3, borderSkipped: false },
-                { label: 'Realisasi', data: [], backgroundColor: '#8b5cf6', borderRadius: 3, borderSkipped: false }
+                { label: 'Target', data: [], backgroundColor: targetColor, borderRadius: 4 },
+                { label: 'Realisasi', data: [], backgroundColor: '#8b5cf6', borderRadius: 4 }
             ]}, options: commonBarOptions
         });
-const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('2d'), {
+
+        const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('2d'), {
             type: 'doughnut',
             data: {
-                // Urutan label dibalik
                 labels: ['Tinggi', 'Waspada', 'Aman'],
                 datasets: [{ 
                     data: [33.3, 33.3, 33.4], 
-                    // Urutan warna dibalik: Merah, Kuning, Hijau
-                    backgroundColor: ['rgba(225, 29, 72, 0.85)', 'rgba(245, 158, 11, 0.85)', 'rgba(16, 185, 129, 0.85)'],
-                    borderWidth: 3,
-                    borderColor: '#0b132b',
-                    borderRadius: 6,
-                    needleValue: 0, 
-                    minValue: 0, 
-                    maxValue: 1000 
+                    backgroundColor: ['#ef4444', '#f59e0b', '#10b981'], 
+                    borderWidth: 3, borderColor: '#ffffff', borderRadius: 4, 
+                    needleValue: 0, minValue: 0, maxValue: 1000 
                 }]
             },
             options: { 
-                responsive: true, maintainAspectRatio: false, circumference: 180, rotation: 270, cutout: '80%', 
+                responsive: true, maintainAspectRatio: false, circumference: 180, rotation: 270, cutout: '78%', 
                 animation: { duration: 1000, easing: 'easeOutQuart' }, 
                 plugins: { legend: { display: false }, tooltip: { enabled: false }, datalabels: { display: false } },
                 layout: { padding: { bottom: 10 } }
@@ -653,66 +507,61 @@ const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('
         const borChart = new Chart(document.getElementById('borChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Kapasitas', data: [], backgroundColor: '#006400', borderRadius: 3, borderSkipped: false },
-                { label: 'Bed Terisi', data: [], backgroundColor: '#00FF00', borderRadius: 3, borderSkipped: false }
+                { label: 'Kapasitas', data: [], backgroundColor: targetColor, borderRadius: 4 },
+                { label: 'Bed Terisi', data: [], backgroundColor: '#10b981', borderRadius: 4 }
             ]}, options: commonBarOptions
         });
 
         const dokterMataChart = new Chart(document.getElementById('dokterMataChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
-                { label: 'Target', data: [], backgroundColor: '#164e63', borderRadius: 3, borderSkipped: false },
-                { label: 'Realisasi', data: [], backgroundColor: '#06b6d4', borderRadius: 3, borderSkipped: false }
+                { label: 'Target', data: [], backgroundColor: targetColor, borderRadius: 4 },
+                { label: 'Realisasi', data: [], backgroundColor: '#0ea5e9', borderRadius: 4 }
             ]}, options: commonHorizontalOptions
         });
 
         const ctxPendapatan = document.getElementById('pendapatanChart').getContext('2d');
         const pendapatanGradient = ctxPendapatan.createLinearGradient(0, 0, 0, 80);
-        pendapatanGradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+        pendapatanGradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
         pendapatanGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
         const pendapatanChart = new Chart(ctxPendapatan, {
             type: 'line',
             data: { labels: [], datasets: [
-                { label: 'Target (Rp)', data: [], borderColor: '#64748b', borderDash: [3, 3], fill: false, tension: 0.4, borderWidth: 1, pointRadius: 0 },
-                { label: 'Realisasi (Rp)', data: [], borderColor: '#10b981', backgroundColor: pendapatanGradient, fill: true, tension: 0.4, borderWidth: 2, pointBackgroundColor: '#0b132b', pointBorderColor: '#10b981', pointBorderWidth: 1.5, pointRadius: 2.5, pointHoverRadius: 4 }
+                { label: 'Target (Rp)', data: [], borderColor: '#94a3b8', borderDash: [4, 4], fill: false, tension: 0.4, borderWidth: 2, pointRadius: 0 },
+                { label: 'Realisasi (Rp)', data: [], borderColor: '#10b981', backgroundColor: pendapatanGradient, fill: true, tension: 0.4, borderWidth: 3, pointBackgroundColor: '#ffffff', pointBorderColor: '#10b981', pointBorderWidth: 2, pointRadius: 3, pointHoverRadius: 5 }
             ]}, 
             options: { 
                 responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, animation: { duration: 600 }, 
-                plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, font: { weight: 600, size: 10 }, color: '#f8fafc' } }, datalabels: { display: false } }, 
-                scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4], display: false }, beginAtZero: true, grace: '10%' } } 
+                plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, font: { weight: 600, size: 10 }, color: '#475569' } }, datalabels: { display: false }, tooltip: tooltipConfig }, 
+                scales: { x: { grid: { display: false } }, y: { border: { display: false }, beginAtZero: true, grace: '10%' } } 
             }
         });
 
-        // FUNGSI AGREGASI DATA DINAMIS DARI ADMIN
         function aggregateData(arr, nameKey, realKey = 'realisasi', targetKey = 'target') {
             if (!arr || !Array.isArray(arr)) return [];
             const result = {};
-            
             arr.forEach(item => {
                 const name = item[nameKey] || item['nama'] || item['spesialisasi'] || item['kategori'] || '-';
-                if (!result[name]) {
-                    result[name] = { 
-                        [nameKey]: name, 
-                        [realKey]: 0, 
-                        [targetKey]: 0 
-                    };
-                }
+                if (!result[name]) { result[name] = { [nameKey]: name, [realKey]: 0, [targetKey]: 0 }; }
                 result[name][realKey] += Number(item[realKey] || 0);
                 result[name][targetKey] = Math.max(result[name][targetKey], Number(item[targetKey] || 0));
             });
-            
             return Object.values(result);
         }
 
        async function updateDashboardFromMySQL() {
             try {
-                // Fetch data dari API Admin
                 const response = await fetch('/api/dashboard');
                 const data = await response.json();
                 if (!data) return;
 
-                // HELPER CHART DINAMIS
+                const getBadgeClass = (persen) => {
+                    if (persen < 50) return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200';
+                    if (persen >= 100) return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 border border-emerald-200';
+                    return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200';
+                };
+
                 const updateChartWithHeader = (chart, dataArray, labelField, realField, targetField, totalTextId, persenBadgeId, isCurrency = false) => {
                     if (!dataArray || !Array.isArray(dataArray)) dataArray = [];
                     chart.data.labels = dataArray.map(i => i[labelField] || i['nama'] || '-');
@@ -724,29 +573,21 @@ const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('
                     const totalTarget = dataArray.reduce((acc, curr) => acc + Number(curr[targetField] || 0), 0);
                     const persen = totalTarget > 0 ? ((totalReal / totalTarget) * 100).toFixed(1) : 0;
 
-                    const fmt = (val) => isCurrency ? formatMiliar(val) : val.toLocaleString('id-ID');
-                    document.getElementById(totalTextId).innerText = `${fmt(totalReal)} / ${fmt(totalTarget)}`;
-                    
+                    document.getElementById(totalTextId).innerText = `${totalReal.toLocaleString('id-ID')} / ${totalTarget.toLocaleString('id-ID')}`;
                     const badge = document.getElementById(persenBadgeId);
                     badge.innerText = `${persen}%`;
-                    badge.className = persen >= 100 
-                        ? 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400' 
-                        : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
+                    badge.className = getBadgeClass(persen);
                 };
 
-                // 1. Sinkronisasi Finansial / Pendapatan
                 const trenArray = data.pendapatan || data.trenPendapatan || [];
-                let targetFin = 0;
-                let realisasiFin = 0;
-                
+                let targetFin = 0, realisasiFin = 0;
                 trenArray.forEach(item => {
                     realisasiFin += Number(item.realisasi || 0);
                     targetFin = Math.max(targetFin, Number(item.target || 0));
                 });
-
                 if (targetFin === 0 && realisasiFin === 0 && data.finansial) {
-                    targetFin = Number(data.finansial.target_pendapatan || data.finansial.target || 0);
-                    realisasiFin = Number(data.finansial.realisasi_pendapatan || data.finansial.realisasi || 0);
+                    targetFin = Number(data.finansial.target || 0);
+                    realisasiFin = Number(data.finansial.realisasi || 0);
                 }
 
                 const gapFin = realisasiFin - targetFin;
@@ -756,153 +597,81 @@ const igdGaugeChart = new Chart(document.getElementById('igdChart').getContext('
                 document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
                 
                 const realisasiBadge = document.getElementById('persenRealisasiText');
-                const persenNum = Number(persenFin);
-
-                if (persenNum < 50) {
-                    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
-                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
-                } else if (persenNum >= 100) {
-                    realisasiBadge.innerHTML = `▲ ${persenFin}%`;
-                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                } else {
-                    realisasiBadge.innerHTML = `▼ ${persenFin}%`;
-                    realisasiBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30";
-                }
+                realisasiBadge.innerHTML = persenFin >= 100 ? `▲ ${persenFin}%` : `▼ ${persenFin}%`;
+                realisasiBadge.className = getBadgeClass(persenFin);
 
                 document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
 
-                // 2. Sinkronisasi Data Kategori Layanan
-                const poliData = aggregateData(data.poli || data.topPoli || [], 'nama_poli');
+                const poliData = aggregateData(data.poli || [], 'nama_poli');
                 const borData = aggregateData(data.bor || [], 'nama_ruangan', 'bed_terisi', 'kapasitas_bed');
                 const kebidananData = aggregateData(data.kebidanan || [], 'nama_dokter');
-                const kamarOperasiData = aggregateData(data.kamarOperasi || data.operasi || [], 'spesialisasi');
-                const dokterMataData = aggregateData(data.mata || data.dokterMata || [], 'nama_dokter');
-let rajalR = 0, rajalT = 0;
-let ranapR = 0, ranapT = 0;
-let igdR = 0, igdT = 0;
+                const kamarOperasiData = aggregateData(data.kamarOperasi || [], 'spesialisasi');
+                const dokterMataData = aggregateData(data.mata || [], 'nama_dokter');
+                
+                let rajalR = 0, rajalT = 0, ranapR = 0, ranapT = 0, igdR = 0, igdT = 0;
+                (data.ringkasan || []).forEach(item => {
+                    const kat = (item.kategori || '').toLowerCase();
+                    const r = Number(item.realisasi || 0), t = Number(item.target || 0);
+                    if (kat.includes('igd')) { igdR += r; igdT = Math.max(igdT, t); } 
+                    else if (kat.includes('rajal')) { rajalR += r; rajalT = Math.max(rajalT, t); } 
+                    else if (kat.includes('ranap')) { ranapR += r; ranapT = Math.max(ranapT, t); }
+                });
 
-const ringkasanArr = data.ringkasan || data.pasien || [];
-if (Array.isArray(ringkasanArr)) {
-    ringkasanArr.forEach(item => {
-        const kat = (item.kategori || '').toLowerCase();
-        const real = Number(item.realisasi || 0);
-        const target = Number(item.target || 0);
-
-        if (kat.includes('igd') || kat.includes('darurat')) {
-            igdR += real;
-            igdT = Math.max(igdT, target);
-        } else if (kat.includes('rawat jalan') || kat.includes('rajal')) {
-            rajalR += real;
-            rajalT = Math.max(rajalT, target);
-        } else if (kat.includes('rawat inap') || kat.includes('ranap')) {
-            ranapR += real;
-            ranapT = Math.max(ranapT, target);
-        }
-    });
-}
-
-if (igdR === 0 && igdT === 0 && data.pasien && !Array.isArray(data.pasien)) {
-    igdR = Number(data.pasien.igd_realisasi || 0);
-    igdT = Number(data.pasien.igd_target || 0);
-}
-
-                const setPatientCard = (idTotal, idBadge, realisasi, target) => {
-                    document.getElementById(idTotal).innerText = `${realisasi.toLocaleString('id-ID')} / ${target.toLocaleString('id-ID')}`;
-                    const persen = target > 0 ? ((realisasi / target) * 100).toFixed(1) : 0;
-                    const badge = document.getElementById(idBadge);
-                    badge.innerText = `${persen}%`;
-                    
-                    if (persen < 50) {
-                        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30';
-                    } else if (persen >= 100) {
-                        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-                    } else {
-                        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
-                    }
+                const setPatientCard = (idTotal, idBadge, r, t) => {
+                    document.getElementById(idTotal).innerText = `${r.toLocaleString('id-ID')} / ${t.toLocaleString('id-ID')}`;
+                    const p = t > 0 ? ((r / t) * 100).toFixed(1) : 0;
+                    const b = document.getElementById(idBadge);
+                    b.innerText = `${p}%`;
+                    b.className = getBadgeClass(p);
                 };
-
                 setPatientCard('rajalTotalText', 'rajalPersenBadge', rajalR, rajalT);
                 setPatientCard('igdTotalText', 'igdPersenBadge', igdR, igdT);
                 setPatientCard('ranapTotalText', 'ranapPersenBadge', ranapR, ranapT);
 
-               // 3. Update Gauge IGD
-igdGaugeChart.data.datasets[0].needleValue = igdR;
-igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
-igdGaugeChart.update();
+                igdGaugeChart.data.datasets[0].needleValue = igdR;
+                igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
+                igdGaugeChart.update();
+                document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
+                
+                const igdPersenAtas = igdT > 0 ? ((igdR / igdT) * 100).toFixed(1) : 0;
+                const headerPersen = document.getElementById('igdHeaderPersen');
+                if (headerPersen) {
+                    headerPersen.style.display = 'inline-block';
+                    headerPersen.innerText = `${igdPersenAtas}%`;
+                    headerPersen.className = getBadgeClass(igdPersenAtas);
+                }
 
-// Update teks nilai di tengah
-document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
-
-// Menghitung dan menampilkan persentase di pojok kanan atas
-const igdPersenAtas = igdT > 0 ? ((igdR / igdT) * 100).toFixed(1) : 0;
-const headerPersen = document.getElementById('igdHeaderPersen');
-
-if (headerPersen) {
-    headerPersen.style.display = 'inline-block'; // Pastikan badge muncul (tidak di-none)
-    headerPersen.innerText = `${igdPersenAtas}%`;
-    
-    // Pewarnaan dinamis sama seperti grafik lain
-    if (igdPersenAtas < 50) {
-        headerPersen.className = 'text-[11px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400';
-    } else if (igdPersenAtas >= 100) {
-        headerPersen.className = 'text-[11px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400';
-    } else {
-        headerPersen.className = 'text-[11px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
-    }
-}
-
-                // 4. Sinkronisasi Data Chart ke Kanvas
                 updateChartWithHeader(topPoliChart, poliData, 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
                 updateChartWithHeader(kebidananChart, kebidananData, 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
                 updateChartWithHeader(kamarOperasiChart, kamarOperasiData, 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
                 updateChartWithHeader(dokterMataChart, dokterMataData, 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
 
-                // 5. Update Chart BOR
                 borChart.data.labels = borData.map(i => i.nama_ruangan || '-');
                 borChart.data.datasets[0].data = borData.map(i => Number(i.kapasitas_bed || 0));
                 borChart.data.datasets[1].data = borData.map(i => Number(i.bed_terisi || 0));
                 borChart.update();
-
+                
                 const borPersen = ranapT > 0 ? ((ranapR / ranapT) * 100).toFixed(1) : 0;
                 document.getElementById('borInfoText').innerText = `Isi: ${ranapR} / Kap: ${ranapT}`;
-                
                 const borBadge = document.getElementById('borTotalText');
                 borBadge.innerText = `${borPersen}%`;
-                
-                if (borPersen < 50) {
-                    borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30';
-                } else if (borPersen >= 100) {
-                    borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-                } else {
-                    borBadge.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30';
-                }
+                borBadge.className = getBadgeClass(borPersen);
 
-                // 6. Update Tren Pendapatan
-                pendapatanChart.data.labels = trenArray.map(i => {
-                    let t = i.tanggal || i.hari || '';
-                    return t ? t.split('T')[0] : '-';
-                });
+                pendapatanChart.data.labels = trenArray.map(i => (i.tanggal || '').split('T')[0]);
                 pendapatanChart.data.datasets[0].data = trenArray.map(i => Number(i.target || 0));    
                 pendapatanChart.data.datasets[1].data = trenArray.map(i => Number(i.realisasi || 0)); 
                 pendapatanChart.update();
-                
                 document.getElementById('trenTotalText').innerText = `Realisasi: ${formatMiliar(realisasiFin)} / Target: ${formatMiliar(targetFin)}`;
                 const trenBadge = document.getElementById('trenPersenBadge');
                 trenBadge.innerText = `${persenFin}%`;
-                trenBadge.className = persenFin >= 100 
-                    ? 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400' 
-                    : 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400';
+                trenBadge.className = getBadgeClass(persenFin);
 
-                // 7. Update Tanggal & Waktu Sinkronisasi
                 const now = new Date();
-                const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-                document.getElementById('currentDateIndicator').innerText = now.toLocaleDateString('id-ID', options);
-                document.getElementById('lastUpdateText').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+                document.getElementById('currentDateIndicator').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-            } catch (err) {
-                console.error('Gagal mensinkronisasikan data dengan admin (MySQL):', err);
-            }
+            } catch (err) { console.error('Gagal mensinkronisasikan data:', err); }
         }
+
         let syncInterval = setInterval(updateDashboardFromMySQL, 3000);
         let isSyncActive = true;
 
@@ -910,55 +679,21 @@ if (headerPersen) {
             const btn = document.getElementById('toggleSyncBtn');
             const icon = document.getElementById('syncIcon');
             const text = document.getElementById('syncText');
-            
             if (isSyncActive) {
-                clearInterval(syncInterval);
-                isSyncActive = false;
-                btn.className = "bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition";
-                icon.className = "fa-solid fa-play";
-                text.innerText = "Live: Dijeda";
+                clearInterval(syncInterval); isSyncActive = false;
+                btn.className = "bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition";
+                icon.className = "fa-solid fa-play"; text.innerText = "Live: Dijeda";
             } else {
-                syncInterval = setInterval(updateDashboardFromMySQL, 3000);
-                isSyncActive = true;
-                btn.className = "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition";
-                icon.className = "fa-solid fa-pause";
-                text.innerText = "Live: Aktif";
+                syncInterval = setInterval(updateDashboardFromMySQL, 3000); isSyncActive = true;
+                btn.className = "bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition";
+                icon.className = "fa-solid fa-pause"; text.innerText = "Live: Aktif";
                 updateDashboardFromMySQL();
             }
         }
-
         function manualRefresh() {
             const icon = document.getElementById('refreshIcon');
-            icon.classList.add('fa-spin');
-            updateDashboardFromMySQL();
-            setTimeout(() => { icon.classList.remove('fa-spin'); }, 600);
-        }
-
-        // MASTER LIST
-        const MASTER_POLI = ['Mata', 'Kebidanan', 'THT', 'Anak', 'Penyakit Dalam'];
-        const MASTER_OPERASI = ['Mata', 'Bedah Umum', 'Kebidanan', 'Ortopedi', 'THT', 'Urologi'];
-        const MASTER_BOR = ['Orchid', 'Peony', 'Lotus', 'ICU', 'PICU'];
-        const MASTER_KEBIDANAN = ['dr. Andri Hondir', 'dr.Jenifer Uriah', 'dr.Rino Apin'];
-        const MASTER_MATA = ['dr.Airina Stefanie', 'dr.Calista Natashya', 'dr.Esti Wardhani', 'dr.Grace', 'dr.Vincent Wang Tahjia', 'dr.Gladys', 'dr.Richardo Rusli'];
-
-        function mergeWithMaster(dbData, masterList, nameKey, realKey = 'realisasi', targetKey = 'target') {
-            if (!dbData) dbData = [];
-            return masterList.map(name => {
-                const found = dbData.find(item => {
-                    const dbName = item[nameKey] || item['nama'] || item['spesialisasi'] || '';
-                    return dbName.trim().toLowerCase() === name.trim().toLowerCase();
-                });
-
-                if (found) {
-                    return found;
-                } else {
-                    return {
-                        [nameKey]: name,
-                        [realKey]: 0,
-                        [targetKey]: 0
-                    };
-                }
-            });
+            icon.classList.add('fa-spin'); updateDashboardFromMySQL();
+            setTimeout(() => icon.classList.remove('fa-spin'), 600);
         }
 
         updateDashboardFromMySQL();
