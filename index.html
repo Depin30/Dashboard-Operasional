@@ -44,7 +44,7 @@
                 <a href="/" class="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-600/20 text-blue-400 font-semibold text-xs border border-blue-500/30 shadow-sm transition">
                     <i class="fa-solid fa-chart-pie w-4 text-center"></i> Display Dashboard
                 </a>
-                <a href="/admin" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
+                <a href="/admin" target="_blank" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
                     <i class="fa-solid fa-pen-to-square w-4 text-center"></i> Entry & Kelola Data
                 </a>
             </div>
@@ -609,13 +609,21 @@
                 const dokterMataData = aggregateData(data.mata || [], 'nama_dokter');
                 
                 let rajalR = 0, rajalT = 0, ranapR = 0, ranapT = 0, igdR = 0, igdT = 0;
-                (data.ringkasan || []).forEach(item => {
-                    const kat = (item.kategori || '').toLowerCase();
-                    const r = Number(item.realisasi || 0), t = Number(item.target || 0);
-                    if (kat.includes('igd')) { igdR += r; igdT = Math.max(igdT, t); } 
-                    else if (kat.includes('rajal')) { rajalR += r; rajalT = Math.max(rajalT, t); } 
-                    else if (kat.includes('ranap')) { ranapR += r; ranapT = Math.max(ranapT, t); }
-                });
+(data.ringkasan || []).forEach(item => {
+    const kat = (item.kategori || '').toLowerCase();
+    const r = Number(item.realisasi || 0), t = Number(item.target || 0);
+    
+    // Pengecekan diperluas untuk mendeteksi nama panjang atau singkatan
+    if (kat.includes('igd') || kat.includes('gawat darurat')) { 
+        igdR += r; igdT = Math.max(igdT, t); 
+    } 
+    else if (kat.includes('rajal') || kat.includes('rawat jalan') || kat.includes('poli')) { 
+        rajalR += r; rajalT = Math.max(rajalT, t); 
+    } 
+    else if (kat.includes('ranap') || kat.includes('rawat inap') || kat.includes('ruang')) { 
+        ranapR += r; ranapT = Math.max(ranapT, t); 
+    }
+});
 
                 const setPatientCard = (idTotal, idBadge, r, t) => {
                     document.getElementById(idTotal).innerText = `${r.toLocaleString('id-ID')} / ${t.toLocaleString('id-ID')}`;
