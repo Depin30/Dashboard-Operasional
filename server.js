@@ -96,6 +96,52 @@ app.get('/api/dashboard', async (req, res) => {
     }
 });
 
+// ==================== API REPORT BULANAN (report.html) ====================
+app.get('/api/report', async (req, res) => {
+    try {
+        // Ambil parameter bulan dan tahun dari URL (default ke bulan & tahun saat ini)
+        const bulan = req.query.bulan || (new Date().getMonth() + 1);
+        const tahun = req.query.tahun || new Date().getFullYear();
+
+        // Query filter berdasarkan bulan dan tahun
+        const filterBulan = `WHERE MONTH(tanggal) = ? AND YEAR(tanggal) = ?`;
+        const params = [bulan, tahun];
+
+        // Ambil data dari seluruh tabel berdasarkan bulan terpilih
+        const [pendapatan] = await pool.query(`SELECT * FROM pendapatan ${filterBulan} ORDER BY tanggal ASC`, params);
+        const [ringkasan] = await pool.query(`SELECT * FROM ringkasan_harian ${filterBulan}`, params);
+        const [poli] = await pool.query(`SELECT * FROM rawat_jalan_poli ${filterBulan}`, params);
+        const [operasi] = await pool.query(`SELECT * FROM kamar_operasi ${filterBulan}`, params);
+        const [bor] = await pool.query(`SELECT * FROM rawat_inap_bor ${filterBulan}`, params);
+        const [kebidanan] = await pool.query(`SELECT * FROM top_tindakan_kebidanan ${filterBulan}`, params);
+        const [mata] = await pool.query(`SELECT * FROM top_ok_mata ${filterBulan}`, params);
+
+        // Fungsi penyamaan kapitalisasi nama (sama seperti di dashboard)
+        const standardizeNames = (data, keyField) => {
+            const nameMap = {};
+            return data.map(item => {
+                if (!item[keyField]) return item;
+                const lower = item[keyField].toLowerCase();
+                if (!nameMap[lower]) nameMap[lower] = item[keyField];
+                return { ...item, [keyField]: nameMap[lower] };
+            });
+        };
+
+        res.json({
+            pendapatan: pendapatan,
+            ringkasan: standardizeNames(ringkasan, 'kategori'),
+            poli: standardizeNames(poli, 'nama_poli'),
+            kamarOperasi: standardizeNames(operasi, 'spesialisasi'),
+            bor: standardizeNames(bor, 'nama_ruangan'),
+            kebidanan: standardizeNames(kebidanan, 'nama_dokter'),
+            mata: standardizeNames(mata, 'nama_dokter')
+        });
+    } catch (err) {
+        console.error("Error /api/report:", err);
+        res.status(500).json({ error: 'Gagal mengambil data laporan bulanan' });
+    }
+});
+
 // ==================== API ADMIN KELOLA DATA (admin.html) ====================
 app.get('/api/admin/all-data', async (req, res) => {
     try {

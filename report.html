@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Operasional - RS Cinta Kasih Tzu Chi</title>
+    <title>Report Dashboard Bulanan - RS Cinta Kasih Tzu Chi</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     
@@ -23,10 +22,17 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        @media print {
+            #sidebar, header, button { display: none !important; }
+            html, body, main { height: auto !important; width: 100% !important; overflow: visible !important; background-color: #ffffff !important; }
+            .card-light { break-inside: avoid; box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+        }
     </style>
 </head>
 <body class="flex h-screen w-screen overflow-hidden antialiased selection:bg-blue-100 selection:text-blue-700">
 
+    <!-- Sidebar -->
     <aside id="sidebar" class="w-64 bg-[#070b19] text-white flex flex-col justify-between shrink-0 border-r border-slate-800 z-20 h-full transition-all duration-300 overflow-hidden">
         <div class="p-4 w-64 shrink-0">
             <div class="mb-6 flex items-center gap-3">
@@ -41,15 +47,15 @@
             
             <div class="space-y-1">
                 <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 mb-1.5">Command Center</p>
-                <a href="/" class="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-600/20 text-blue-400 font-semibold text-xs border border-blue-500/30 shadow-sm transition">
+                <a href="/" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
                     <i class="fa-solid fa-chart-pie w-4 text-center"></i> Display Dashboard
                 </a>
                 <a href="/admin" target="_blank" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
                     <i class="fa-solid fa-pen-to-square w-4 text-center"></i> Entry & Kelola Data
                 </a>
-                <a href="report.html" target="_blank" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium text-xs transition">
-                    <i class="fa-solid fa-chart-line w-4 text-center">
-                 </a>
+                <a href="report.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-600/20 text-blue-400 font-semibold text-xs border border-blue-500/30 shadow-sm transition">
+                    <i class="fa-solid fa-chart-line w-4 text-center"></i> Report Dashboard
+                </a>
             </div>
         </div>
 
@@ -65,6 +71,7 @@
     </aside>
 
     <main class="flex-1 h-full overflow-hidden flex flex-col min-h-0 bg-slate-50">
+        <!-- Header -->
         <header class="bg-black/95 backdrop-blur-md px-6 py-2.5 border-b border-slate-800 flex justify-between items-center shrink-0 z-30 shadow-sm">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center">
@@ -72,36 +79,61 @@
                 </button>
                 <div>
                     <h2 class="text-sm font-extrabold text-white tracking-tight flex items-center gap-2">
-                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        DASHBOARD OPERASIONAL HARIAN
+                        <i class="fa-solid fa-file-contract text-emerald-400"></i>
+                        REPORT DASHBOARD BULANAN
                     </h2>
-                    <p class="text-[10px] text-slate-400 font-medium">Live monitoring operasional dan finansial rumah sakit</p>
+                    <p class="text-[10px] text-slate-400 font-medium">Laporan historis data operasional dan finansial</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
+            
+            <div class="flex items-center gap-3">
+                <!-- Wrapper Selector Bulan -->
+                <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-xl px-3 py-1 shadow-inner focus-within:border-blue-500">
+                    <i class="fa-solid fa-calendar-days text-blue-400 text-xs"></i>
+                    <select id="monthSelector" onchange="loadReportData()" class="bg-transparent text-white text-xs font-black tracking-wide py-1 outline-none cursor-pointer">
+                        <option value="1" class="bg-slate-900 text-white font-bold py-1">Januari</option>
+                        <option value="2" class="bg-slate-900 text-white font-bold py-1">Februari</option>
+                        <option value="3" class="bg-slate-900 text-white font-bold py-1">Maret</option>
+                        <option value="4" class="bg-slate-900 text-white font-bold py-1">April</option>
+                        <option value="5" class="bg-slate-900 text-white font-bold py-1">Mei</option>
+                        <option value="6" class="bg-slate-900 text-white font-bold py-1">Juni</option>
+                        <option value="7" class="bg-slate-900 text-white font-bold py-1">Juli</option>
+                        <option value="8" class="bg-slate-900 text-white font-bold py-1">Agustus</option>
+                        <option value="9" class="bg-slate-900 text-white font-bold py-1">September</option>
+                        <option value="10" class="bg-slate-900 text-white font-bold py-1">Oktober</option>
+                        <option value="11" class="bg-slate-900 text-white font-bold py-1">November</option>
+                        <option value="12" class="bg-slate-900 text-white font-bold py-1">Desember</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2 bg-slate-900 border border-slate-600 rounded-xl px-3 py-1 shadow-inner focus-within:border-blue-500">
+                    <i class="fa-solid fa-calendar-check text-emerald-400 text-xs"></i>
+                    <select id="yearSelector" onchange="loadReportData()" class="bg-transparent text-white text-xs font-black tracking-wide py-1 outline-none cursor-pointer">
+                    </select>
+                </div> 
+
                 <button onclick="toggleFullScreen()" title="Layar Penuh" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 shadow-sm px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-expand" id="fullScreenIcon"></i> <span id="fullScreenText">Full Screen</span>
+                    <i class="fa-solid fa-expand" id="fullScreenIcon"></i> Full Screen
                 </button>
-                
-                <button onclick="manualRefresh()" title="Ambil data terbaru sekarang" class="bg-blue-950/60 hover:bg-blue-900/80 text-blue-400 border border-blue-800/60 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+
+                <button onclick="loadReportData()" title="Muat Data Laporan" class="bg-blue-950/60 hover:bg-blue-900/80 text-blue-400 border border-blue-800/60 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> Refresh
                 </button>
-                <button id="toggleSyncBtn" onclick="toggleSync()" title="Jeda atau Lanjutkan Sinkronisasi Otomatis" class="bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-400 border border-emerald-800/60 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-pause" id="syncIcon"></i> <span id="syncText">Live: Aktif</span>
+
+                <button onclick="window.print()" title="Cetak / Ekspor Laporan" class="bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-400 border border-emerald-800/60 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-print"></i> Ekspor / Print
                 </button>
-                <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 border border-slate-800">
-                    <i class="fa-regular fa-calendar-days text-blue-400"></i>
-                    <span id="currentDateIndicator">Memuat tanggal...</span>
-                </div>
             </div>
         </header>
 
+        <!-- Main Content Layout -->
         <div class="p-3 flex-1 grid grid-rows-[auto_minmax(0,1fr)_105px] gap-3 overflow-hidden max-w-[1700px] w-full mx-auto min-h-0">
+            
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 lg:grid-cols-6 gap-3">
                 <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div>
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Target Pendapatan</span>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Target Bulanan</span>
                         <h3 id="targetFinansialText" class="text-base font-black text-slate-800 tracking-tight mt-0.5">Rp 0</h3>
                     </div>
                     <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex justify-center items-center text-sm border border-blue-200"><i class="fa-solid fa-bullseye"></i></div>
@@ -109,7 +141,7 @@
 
                 <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div class="w-full">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Realisasi Pendapatan</span>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Realisasi Bulanan</span>
                         <div class="flex items-baseline gap-2 mt-0.5">
                             <h3 id="realisasiText" class="text-base font-black text-slate-800 tracking-tight">Rp 0</h3>
                             <span id="persenRealisasiText" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0%</span>
@@ -120,7 +152,7 @@
 
                 <div class="card-light px-3.5 py-2.5 flex items-center justify-between">
                     <div>
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Gap / Selisih Target</span>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Selisih Target</span>
                         <h3 id="gapText" class="text-base font-black text-slate-800 tracking-tight mt-0.5">Rp 0</h3>
                     </div>
                     <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex justify-center items-center text-sm border border-purple-200"><i class="fa-solid fa-chart-line"></i></div>
@@ -155,11 +187,12 @@
                     </div>
                     <span id="ranapPersenBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0%</span>
                 </div>
-            </div>
+            </div>  
 
             <!-- Charts Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-3 min-h-0">
                 
+                <!-- 1. Top Poliklinik -->
                 <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
@@ -173,7 +206,8 @@
                     </div>
                     <div class="relative w-full flex-1 min-h-0"><canvas id="topPoliChart"></canvas></div>
                 </div>
-                
+
+                <!-- 2. Top Kebidanan -->
                 <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
@@ -188,6 +222,7 @@
                     <div class="relative w-full flex-1 min-h-0"><canvas id="kebidananChart"></canvas></div>
                 </div>
 
+                <!-- 3. Kamar Operasi (OK) -->
                 <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
@@ -202,10 +237,9 @@
                     <div class="relative w-full flex-1 min-h-0"><canvas id="kamarOperasiChart"></canvas></div>
                 </div>
 
-                <!-- IGD Gauge -->
+                <!-- 4. Capaian IGD Gauge -->
                 <div class="card-light p-3 flex flex-col justify-between min-h-0 relative overflow-hidden">
                     <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-48 h-24 bg-blue-100 blur-3xl pointer-events-none z-0"></div>
-                    
                     <div class="flex justify-between items-center mb-1 shrink-0 relative z-10">
                         <div class="flex items-center gap-2">
                             <div class="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs border border-blue-200"><i class="fa-solid fa-gauge-high"></i></div>
@@ -238,6 +272,7 @@
                     <div class="relative w-full flex-1 min-h-0"><canvas id="borChart"></canvas></div>
                 </div>
 
+                <!-- 6. Top OK Mata -->
                 <div class="card-light p-3 flex flex-col justify-between min-h-0">
                     <div class="flex justify-between items-center mb-1 shrink-0">
                         <div class="flex items-center gap-2">
@@ -253,7 +288,7 @@
                 </div>
             </div>
 
-            <!-- Tren Chart -->
+            <!-- 7. Tren Chart -->
             <div class="card-light p-3 flex flex-col justify-between min-h-0">
                 <div class="flex justify-between items-center mb-2 shrink-0">
                     <div class="flex items-center gap-2">
@@ -278,31 +313,17 @@
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('w-64');
             sidebar.classList.toggle('w-0');
-        }
+        } 
+
+        
+    
         function toggleFullScreen() {
-            const icon = document.getElementById('fullScreenIcon');
-            const text = document.getElementById('fullScreenText');
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => console.error(err));
-                if (icon) icon.className = 'fa-solid fa-compress';
-                if (text) text.innerText = 'Exit Fullscreen';
             } else {
                 if (document.exitFullscreen) document.exitFullscreen();
-                if (icon) icon.className = 'fa-solid fa-expand';
-                if (text) text.innerText = 'Full Screen';
-            }
+            } 
         }
-        document.addEventListener('fullscreenchange', () => {
-            const icon = document.getElementById('fullScreenIcon');
-            const text = document.getElementById('fullScreenText');
-            if (!document.fullscreenElement) {
-                if (icon) icon.className = 'fa-solid fa-expand';
-                if (text) text.innerText = 'Full Screen';
-            } else {
-                if (icon) icon.className = 'fa-solid fa-compress';
-                if (text) text.innerText = 'Exit Fullscreen';
-            }
-        });
 
         const formatMiliar = (val) => {
             const inMiliar = val / 1000000000;
@@ -311,7 +332,7 @@
 
         Chart.register(ChartDataLabels);
 
-        // DEFAULT CHART.JS (TEMA TERANG)
+        // DEFAULT CHART CONFIG
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#64748b'; 
         Chart.defaults.scale.grid.color = '#f1f5f9'; 
@@ -423,13 +444,13 @@
                         if (context.datasetIndex === 0) return value.toLocaleString('id-ID'); 
                         const target = context.chart.data.datasets[0].data[context.dataIndex] || 0;
                         if (target > 0) return `${value.toLocaleString('id-ID')} (${((value/target)*100).toFixed(1)}%)`;
-                        return value.toLocaleString('id-ID'); 
+                        return value.toLocaleString('id-ID');
                     }
                 } 
             },
             scales: { y: { grid: { display: false } }, x: { border: { display: false }, beginAtZero: true, grace: '25%' } }
         };
-
+        
         const modernGaugeNeedle = {
             id: 'modernGaugeNeedle',
             afterDatasetsDraw(chart) {
@@ -464,6 +485,7 @@
 
         const targetColor = '#9a9a9a'; 
 
+        // INSTANSIASI GRAFIK
         const topPoliChart = new Chart(document.getElementById('topPoliChart').getContext('2d'), {
             type: 'bar',
             data: { labels: [], datasets: [
@@ -542,179 +564,205 @@
             }
         });
 
-        function aggregateData(arr, nameKey, realKey = 'realisasi', targetKey = 'target') {
-            if (!arr || !Array.isArray(arr)) return [];
-            const result = {};
-            arr.forEach(item => {
-                const name = item[nameKey] || item['nama'] || item['spesialisasi'] || item['kategori'] || '-';
-                if (!result[name]) { result[name] = { [nameKey]: name, [realKey]: 0, [targetKey]: 0 }; }
-                result[name][realKey] += Number(item[realKey] || 0);
-                result[name][targetKey] = Math.max(result[name][targetKey], Number(item[targetKey] || 0));
-            });
-            return Object.values(result);
-        }
-
-       async function updateDashboardFromMySQL() {
-            try {
-                const response = await fetch('/api/dashboard');
-                const data = await response.json();
-                if (!data) return;
-
-                const getBadgeClass = (persen) => {
-                    if (persen < 50) return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200';
-                    if (persen >= 100) return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 border border-emerald-200';
-                    return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200';
-                };
-
-                const updateChartWithHeader = (chart, dataArray, labelField, realField, targetField, totalTextId, persenBadgeId, isCurrency = false) => {
-                    if (!dataArray || !Array.isArray(dataArray)) dataArray = [];
-                    chart.data.labels = dataArray.map(i => i[labelField] || i['nama'] || '-');
-                    chart.data.datasets[0].data = dataArray.map(i => Number(i[targetField] || 0));
-                    chart.data.datasets[1].data = dataArray.map(i => Number(i[realField] || 0));
-                    chart.update();
-
-                    const totalReal = dataArray.reduce((acc, curr) => acc + Number(curr[realField] || 0), 0);
-                    const totalTarget = dataArray.reduce((acc, curr) => acc + Number(curr[targetField] || 0), 0);
-                    const persen = totalTarget > 0 ? ((totalReal / totalTarget) * 100).toFixed(1) : 0;
-
-                    document.getElementById(totalTextId).innerText = `${totalReal.toLocaleString('id-ID')} / ${totalTarget.toLocaleString('id-ID')}`;
-                    const badge = document.getElementById(persenBadgeId);
-                    badge.innerText = `${persen}%`;
-                    badge.className = getBadgeClass(persen);
-                };
-
-                const trenArray = data.pendapatan || data.trenPendapatan || [];
-                let targetFin = 0, realisasiFin = 0;
-                trenArray.forEach(item => {
-                    realisasiFin += Number(item.realisasi || 0);
-                    targetFin = Math.max(targetFin, Number(item.target || 0));
-                });
-                if (targetFin === 0 && realisasiFin === 0 && data.finansial) {
-                    targetFin = Number(data.finansial.target || 0);
-                    realisasiFin = Number(data.finansial.realisasi || 0);
+        function setSelectToCurrentMonth() {
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1;
+            const currentYear = now.getFullYear();
+            
+            const monthSelector = document.getElementById('monthSelector');
+            if (monthSelector) {
+                monthSelector.value = currentMonth.toString();
+            }
+            
+            const yearSelector = document.getElementById('yearSelector');
+            if (yearSelector) {
+                yearSelector.innerHTML = '';
+                const startYear = 2024;
+                
+                for (let i = startYear; i <= currentYear; i++) {
+                    let option = document.createElement('option');
+                    option.value = i;
+                    option.text = i;
+                    option.className = "bg-slate-900 text-white font-bold py-1";
+                    yearSelector.appendChild(option);
                 }
 
-                const gapFin = realisasiFin - targetFin;
-                const persenFin = targetFin > 0 ? ((realisasiFin / targetFin) * 100).toFixed(1) : 0;
-
-                document.getElementById('targetFinansialText').innerText = formatMiliar(targetFin);
-                document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
-                
-                const realisasiBadge = document.getElementById('persenRealisasiText');
-                realisasiBadge.innerHTML = persenFin >= 100 ? `▲ ${persenFin}%` : `▼ ${persenFin}%`;
-                realisasiBadge.className = getBadgeClass(persenFin);
-
-                document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
-
-                const poliData = aggregateData(data.poli || [], 'nama_poli');
-                const borData = aggregateData(data.bor || [], 'nama_ruangan', 'bed_terisi', 'kapasitas_bed');
-                const kebidananData = aggregateData(data.kebidanan || [], 'nama_dokter');
-                const kamarOperasiData = aggregateData(data.kamarOperasi || [], 'spesialisasi');
-                const dokterMataData = aggregateData(data.mata || [], 'nama_dokter');
-                
-                let rajalR = 0, rajalT = 0, ranapR = 0, ranapT = 0, igdR = 0, igdT = 0;
-(data.ringkasan || []).forEach(item => {
-    const kat = (item.kategori || '').toLowerCase();
-    const r = Number(item.realisasi || 0), t = Number(item.target || 0);
-    
-    // Pengecekan diperluas untuk mendeteksi nama panjang atau singkatan
-    if (kat.includes('igd') || kat.includes('gawat darurat')) { 
-        igdR += r; igdT = Math.max(igdT, t); 
-    } 
-    else if (kat.includes('rajal') || kat.includes('rawat jalan') || kat.includes('poli')) { 
-        rajalR += r; rajalT = Math.max(rajalT, t); 
-    } 
-    else if (kat.includes('ranap') || kat.includes('rawat inap') || kat.includes('ruang')) { 
-        ranapR += r; ranapT = Math.max(ranapT, t); 
-    }
-});
-
-                const setPatientCard = (idTotal, idBadge, r, t) => {
-                    document.getElementById(idTotal).innerText = `${r.toLocaleString('id-ID')} / ${t.toLocaleString('id-ID')}`;
-                    const p = t > 0 ? ((r / t) * 100).toFixed(1) : 0;
-                    const b = document.getElementById(idBadge);
-                    b.innerText = `${p}%`;
-                    b.className = getBadgeClass(p);
-                };
-                setPatientCard('rajalTotalText', 'rajalPersenBadge', rajalR, rajalT);
-                setPatientCard('igdTotalText', 'igdPersenBadge', igdR, igdT);
-                setPatientCard('ranapTotalText', 'ranapPersenBadge', ranapR, ranapT);
-
-                igdGaugeChart.data.datasets[0].needleValue = igdR;
-                igdGaugeChart.data.datasets[0].maxValue = igdT > 0 ? igdT : 1000;
-                igdGaugeChart.update();
-                document.getElementById('igdCenterValue').innerText = igdR.toLocaleString('id-ID');
-                
-                const igdPersenAtas = igdT > 0 ? ((igdR / igdT) * 100).toFixed(1) : 0;
-                const headerPersen = document.getElementById('igdHeaderPersen');
-                if (headerPersen) {
-                    headerPersen.style.display = 'inline-block';
-                    headerPersen.innerText = `${igdPersenAtas}%`;
-                    headerPersen.className = getBadgeClass(igdPersenAtas);
-                }
-
-                updateChartWithHeader(topPoliChart, poliData, 'nama_poli', 'realisasi', 'target', 'poliTotalText', 'poliPersenBadge');
-                updateChartWithHeader(kebidananChart, kebidananData, 'nama_dokter', 'realisasi', 'target', 'kebidananTotalText', 'kebidananPersenBadge');
-                updateChartWithHeader(kamarOperasiChart, kamarOperasiData, 'spesialisasi', 'realisasi', 'target', 'operasiTotalText', 'operasiPersenBadge');
-                updateChartWithHeader(dokterMataChart, dokterMataData, 'nama_dokter', 'realisasi', 'target', 'mataTotalText', 'mataPersenBadge');
-
-                // 1. Render data ke chart BOR
-                borChart.data.labels = borData.map(i => i.nama_ruangan || '-');
-                borChart.data.datasets[0].data = borData.map(i => Number(i.kapasitas_bed || 0));
-                borChart.data.datasets[1].data = borData.map(i => Number(i.bed_terisi || 0));
-                borChart.update();
-
-                // 2. Hitung total tempat tidur terisi dan total kapasitas dari borData
-                const totalBedTerisi = borData.reduce((acc, curr) => acc + Number(curr.bed_terisi || 0), 0);
-                const totalKapasitasBed = borData.reduce((acc, curr) => acc + Number(curr.kapasitas_bed || 0), 0);
-                const borPersen = totalKapasitasBed > 0 ? ((totalBedTerisi / totalKapasitasBed) * 100).toFixed(1) : 0;
-
-                // 3. Tampilkan angka akumulasi bed & persentase BOR 
-                document.getElementById('borInfoText').innerText = `Isi: ${totalBedTerisi} / Kap: ${totalKapasitasBed}`;
-                const borBadge = document.getElementById('borTotalText');
-                borBadge.innerText = `${borPersen}%`;
-                borBadge.className = getBadgeClass(borPersen);
-
-                pendapatanChart.data.labels = trenArray.map(i => (i.tanggal || '').split('T')[0]);
-                pendapatanChart.data.datasets[0].data = trenArray.map(i => Number(i.target || 0));    
-                pendapatanChart.data.datasets[1].data = trenArray.map(i => Number(i.realisasi || 0)); 
-                pendapatanChart.update();
-                document.getElementById('trenTotalText').innerText = `Realisasi: ${formatMiliar(realisasiFin)} / Target: ${formatMiliar(targetFin)}`;
-                const trenBadge = document.getElementById('trenPersenBadge');
-                trenBadge.innerText = `${persenFin}%`;
-                trenBadge.className = getBadgeClass(persenFin);
-
-                const now = new Date();
-                document.getElementById('currentDateIndicator').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
-            } catch (err) { console.error('Gagal mensinkronisasikan data:', err); }
-        }
-
-        let syncInterval = setInterval(updateDashboardFromMySQL, 3000);
-        let isSyncActive = true;
-
-        function toggleSync() {
-            const btn = document.getElementById('toggleSyncBtn');
-            const icon = document.getElementById('syncIcon');
-            const text = document.getElementById('syncText');
-            if (isSyncActive) {
-                clearInterval(syncInterval); isSyncActive = false;
-                btn.className = "bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition";
-                icon.className = "fa-solid fa-play"; text.innerText = "Live: Dijeda";
-            } else {
-                syncInterval = setInterval(updateDashboardFromMySQL, 3000); isSyncActive = true;
-                btn.className = "bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition";
-                icon.className = "fa-solid fa-pause"; text.innerText = "Live: Aktif";
-                updateDashboardFromMySQL();
+                yearSelector.value = currentYear.toString();
             }
         }
-        function manualRefresh() {
+
+        async function loadReportData() {
             const icon = document.getElementById('refreshIcon');
-            icon.classList.add('fa-spin'); updateDashboardFromMySQL();
-            setTimeout(() => icon.classList.remove('fa-spin'), 600);
+            icon.classList.add('fa-spin');
+            
+            const selectedMonth = document.getElementById('monthSelector').value;
+            const selectedYear = document.getElementById('yearSelector').value;
+            
+            try {
+                const response = await fetch(`/api/report?bulan=${selectedMonth}&tahun=${selectedYear}`);
+                if (!response.ok) throw new Error('Gagal memuat data dari server');
+                
+                const dbData = await response.json();
+                const processedData = transformDataForUI(dbData, selectedMonth, selectedYear);
+                renderDataToUI(processedData);
+            } catch (err) {
+                console.error('Error fetching database:', err);
+                alert('Gagal mengambil data dari database.');
+            } finally {
+                setTimeout(() => icon.classList.remove('fa-spin'), 600);
+            }
         }
 
-        updateDashboardFromMySQL();
+        function transformDataForUI(db, month, year) {
+    const sumBy = (arr, key) => arr ? arr.reduce((acc, curr) => acc + (Number(curr[key]) || 0), 0) : 0;
+    const maxBy = (arr, key) => arr && arr.length > 0 ? Math.max(...arr.map(curr => Number(curr[key]) || 0)) : 0;
+
+    // Gunakan maxBy untuk target finansial agar tidak berlipat ganda
+    const targetFin = maxBy(db.pendapatan, 'target');
+    const realisasiFin = sumBy(db.pendapatan, 'realisasi');
+
+    const getRingkasan = (kategori) => {
+        const filtered = (db.ringkasan || []).filter(r => r.kategori && r.kategori.toLowerCase().includes(kategori.toLowerCase()));
+        return { 
+            t: maxBy(filtered, 'target'), 
+            r: sumBy(filtered, 'realisasi') 
+        };
+    };
+    const groupByAndSum = (arr, nameKey, targetKey, realisasiKey) => {
+        if (!arr || !Array.isArray(arr)) return [];
+        const map = {};
+        arr.forEach(item => {
+            const name = item[nameKey] || item['nama'] || item['spesialisasi'] || '-';
+            if (!map[name]) map[name] = { r: 0, t: 0, name: name };
+            
+            // Ambil angka terbesar untuk target menggunakan Math.max
+            map[name].t = Math.max(map[name].t, Number(item[targetKey]) || 0);
+            
+            // Realisasi tetap dijumlahkan
+            map[name].r += Number(item[realisasiKey]) || 0;
+        });
+        return Object.values(map);
+    };
+
+    const daysInMonth = new Date(year, month, 0).getDate(); 
+    const trenTarget = Array(daysInMonth).fill(0);
+    const trenRealisasi = Array(daysInMonth).fill(0);
+
+    (db.pendapatan || []).forEach(p => {
+        const dateObj = new Date(p.tanggal);
+        const dayIndex = dateObj.getDate() - 1;
+        if (dayIndex >= 0 && dayIndex < daysInMonth) {
+            // Target per hari diset ke nilai maksimum, bukan ditambahkan
+            trenTarget[dayIndex] = Math.max(trenTarget[dayIndex], Number(p.target || 0));
+            trenRealisasi[dayIndex] += Number(p.realisasi || 0);
+        }
+    });
+
+    return {
+        finansial: { target: targetFin, realisasi: realisasiFin },
+        kunjungan: { 
+            rajal: getRingkasan('rawat jalan'),
+            igd: getRingkasan('igd'),
+            ranap: getRingkasan('rawat inap')
+        },
+        charts: {
+            poli: groupByAndSum(db.poli, 'nama_poli', 'target', 'realisasi'),
+            kebidanan: groupByAndSum(db.kebidanan, 'nama_dokter', 'target', 'realisasi'),
+            operasi: groupByAndSum(db.kamarOperasi, 'spesialisasi', 'target', 'realisasi'),
+            mata: groupByAndSum(db.mata, 'nama_dokter', 'target', 'realisasi'),
+            bor: groupByAndSum(db.bor, 'nama_ruangan', 'kapasitas_bed', 'bed_terisi'),
+            daysInMonth: daysInMonth
+        },
+        tren: { target: trenTarget, realisasi: trenRealisasi }
+    };
+}
+
+        const getBadgeClass = (persen) => {
+            if (persen < 50) return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200';
+            if (persen >= 100) return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 border border-emerald-200';
+            return 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200';
+        };
+
+        function renderDataToUI(data) {
+            const targetFin = data.finansial.target;
+            const realisasiFin = data.finansial.realisasi;
+            const gapFin = realisasiFin - targetFin;
+            const persenFin = targetFin > 0 ? ((realisasiFin / targetFin) * 100).toFixed(1) : 0;
+
+            document.getElementById('targetFinansialText').innerText = formatMiliar(targetFin);
+            document.getElementById('realisasiText').innerText = formatMiliar(realisasiFin);
+            
+            const realisasiBadge = document.getElementById('persenRealisasiText');
+            realisasiBadge.innerHTML = persenFin >= 100 ? `▲ ${persenFin}%` : `▼ ${persenFin}%`;
+            realisasiBadge.className = getBadgeClass(persenFin);
+            document.getElementById('gapText').innerText = `${gapFin < 0 ? '-' : '+'} Rp ${Math.abs(gapFin).toLocaleString('id-ID')}`;
+
+            const setPatientCard = (idTotal, idBadge, obj) => {
+                document.getElementById(idTotal).innerText = `${obj.r.toLocaleString('id-ID')} / ${obj.t.toLocaleString('id-ID')}`;
+                const p = obj.t > 0 ? ((obj.r / obj.t) * 100).toFixed(1) : 0;
+                const b = document.getElementById(idBadge);
+                b.innerText = `${p}%`; b.className = getBadgeClass(p);
+            };
+            setPatientCard('rajalTotalText', 'rajalPersenBadge', data.kunjungan.rajal);
+            setPatientCard('igdTotalText', 'igdPersenBadge', data.kunjungan.igd);
+            setPatientCard('ranapTotalText', 'ranapPersenBadge', data.kunjungan.ranap);
+
+            igdGaugeChart.data.datasets[0].needleValue = data.kunjungan.igd.r;
+            igdGaugeChart.data.datasets[0].maxValue = data.kunjungan.igd.t === 0 ? 1000 : data.kunjungan.igd.t;
+            igdGaugeChart.update();
+            document.getElementById('igdCenterValue').innerText = data.kunjungan.igd.r.toLocaleString('id-ID');
+            
+            const igdPersenAtas = data.kunjungan.igd.t > 0 ? ((data.kunjungan.igd.r / data.kunjungan.igd.t) * 100).toFixed(1) : 0;
+            const headerPersen = document.getElementById('igdHeaderPersen');
+            headerPersen.innerText = `${igdPersenAtas}%`;
+            headerPersen.className = getBadgeClass(igdPersenAtas);
+
+            const updateBarChart = (chart, dataArray, totalTextId, persenBadgeId) => {
+                chart.data.labels = dataArray.map(i => i.name);
+                chart.data.datasets[0].data = dataArray.map(i => i.t);
+                chart.data.datasets[1].data = dataArray.map(i => i.r);
+                chart.update();
+                
+                const totalR = dataArray.reduce((acc, curr) => acc + curr.r, 0);
+                const totalT = dataArray.reduce((acc, curr) => acc + curr.t, 0);
+                const p = totalT > 0 ? ((totalR / totalT) * 100).toFixed(1) : 0;
+                
+                document.getElementById(totalTextId).innerText = `${totalR.toLocaleString('id-ID')} / ${totalT.toLocaleString('id-ID')}`;
+                const badge = document.getElementById(persenBadgeId);
+                badge.innerText = `${p}%`; badge.className = getBadgeClass(p);
+            };
+
+            updateBarChart(topPoliChart, data.charts.poli, 'poliTotalText', 'poliPersenBadge');
+            updateBarChart(kebidananChart, data.charts.kebidanan, 'kebidananTotalText', 'kebidananPersenBadge');
+            updateBarChart(kamarOperasiChart, data.charts.operasi, 'operasiTotalText', 'operasiPersenBadge');
+            updateBarChart(dokterMataChart, data.charts.mata, 'mataTotalText', 'mataPersenBadge');
+
+            borChart.data.labels = data.charts.bor.map(i => i.name);
+            borChart.data.datasets[0].data = data.charts.bor.map(i => i.t); 
+            borChart.data.datasets[1].data = data.charts.bor.map(i => i.r); 
+            borChart.update();
+            const totalIsi = data.charts.bor.reduce((acc, curr) => acc + curr.r, 0);
+            const totalKap = data.charts.bor.reduce((acc, curr) => acc + curr.t, 0);
+            const borPersen = totalKap > 0 ? ((totalIsi / totalKap) * 100).toFixed(1) : 0;
+            document.getElementById('borInfoText').innerText = `Isi: ${totalIsi} / Kap: ${totalKap}`;
+            const borBadge = document.getElementById('borTotalText');
+            borBadge.innerText = `${borPersen}%`; borBadge.className = getBadgeClass(borPersen);
+
+            const daysInMonthArr = Array.from({length: data.charts.daysInMonth}, (_, i) => `Tgl ${i+1}`);
+            pendapatanChart.data.labels = daysInMonthArr;
+            pendapatanChart.data.datasets[0].data = data.tren.target;    
+            pendapatanChart.data.datasets[1].data = data.tren.realisasi; 
+            pendapatanChart.update();
+            
+            document.getElementById('trenTotalText').innerText = `Realisasi: ${formatMiliar(realisasiFin)} / Target: ${formatMiliar(targetFin)}`;
+            const trenBadge = document.getElementById('trenPersenBadge');
+            trenBadge.innerText = `${persenFin}%`; trenBadge.className = getBadgeClass(persenFin);
+        }
+
+        window.onload = function() {
+            setSelectToCurrentMonth();
+            loadReportData();
+        };
     </script>
 </body>
 </html>
